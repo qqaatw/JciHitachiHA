@@ -48,7 +48,6 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     api = hass.data[API]
 
-
     async def async_update_data():
         """Fetch data from API endpoint.
 
@@ -225,8 +224,6 @@ class JciHitachiClimateEntity(ClimateEntity, JciHitachiEntity):
 
         if not ret:
             _LOGGER.error("Setting hvac_mode failed.")
-        
-        
 
     async def async_set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
