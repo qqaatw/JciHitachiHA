@@ -1,0 +1,9 @@
+{
+  "domain": "jcihitachi_tw",
+  "name": "jcihitachi_tw",
+  "version": "0.0.1",
+  "documentation": "Under development",
+  "requirements": ["LibJciHitachi==0.0.4"],
+  "codeowners": ["qqaatw"],
+  "iot_class": "cloud_polling"
+}

@@ -1,0 +1,19 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+jcihitachi_tw:
+  email: yourname@yourdomain.com
+  password: password
+  devices:
+    - DEVICE_A_NAME
+    - DEVICE_B_NAME
