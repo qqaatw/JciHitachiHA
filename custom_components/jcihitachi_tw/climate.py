@@ -65,6 +65,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                     _LOGGER.debug("Data updated successfully.")
 
                 await hass.async_add_executor_job(api.refresh_status)
+                _LOGGER.debug(
+                    f"Peripheral Info: {[peripheral for peripheral in api._peripherals.values()]}")
                 return api.get_status()
         except Exception as err:
             _LOGGER.error(f"Error communicating with API: {err}")
@@ -171,6 +173,8 @@ class JciHitachiClimateEntity(ClimateEntity, JciHitachiEntity):
             if status.air_speed == "auto":
                 return FAN_AUTO
             elif status.air_speed == "silent":
+                return FAN_LOW
+            elif status.air_speed == "low":
                 return FAN_LOW
             elif status.air_speed == "moderate":
                 return FAN_MEDIUM
