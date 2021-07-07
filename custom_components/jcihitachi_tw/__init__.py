@@ -109,3 +109,16 @@ class JciHitachiEntity(CoordinatorEntity):
     def unique_id(self):
         """Return the peripheral's unique id."""
         return self._peripheral.gateway_mac_address
+    
+    async def update(self, command, value, device_name):
+        self.coordinator.hass.data[UPDATE_DATA].put(
+            UpdateData(
+                command,
+                value,
+                device_name
+            )
+        )
+    
+    async def refresh(self):
+        await self.coordinator.async_request_refresh()
+        return True

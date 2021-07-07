@@ -1,5 +1,6 @@
 """JciHitachi integration."""
 import logging
+import asyncio
 import async_timeout
 from datetime import timedelta
 
@@ -17,8 +18,12 @@ from homeassistant.components.climate.const import (
     HVAC_MODE_FAN_ONLY,
     HVAC_MODE_HEAT,
     HVAC_MODE_OFF,
+    PRESET_NONE,
+    PRESET_BOOST,
+    PRESET_ECO,
     SUPPORT_FAN_MODE,
     SUPPORT_TARGET_TEMPERATURE,
+    SUPPORT_PRESET_MODE
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from homeassistant.helpers.update_coordinator import (
@@ -31,6 +36,9 @@ from . import API, UPDATE_DATA, JciHitachiEntity, UpdateData
 
 _LOGGER = logging.getLogger(__name__)
 
+PRESET_MOLD_PREVENTION = "Mold Prev"
+PRESET_ECO_MOLD_PREVENTION = "Eco & Mold Prev"
+
 SUPPORT_FAN = [FAN_AUTO, FAN_LOW, FAN_MEDIUM, FAN_HIGH]
 SUPPORT_HVAC = [
     HVAC_MODE_OFF,
@@ -40,7 +48,14 @@ SUPPORT_HVAC = [
     HVAC_MODE_AUTO,
     HVAC_MODE_HEAT,
 ]
-SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
+SUPPORT_PRESET = [
+    PRESET_NONE,
+    PRESET_BOOST,
+    PRESET_ECO,
+    PRESET_MOLD_PREVENTION,
+    PRESET_ECO_MOLD_PREVENTION
+]
+SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE | SUPPORT_PRESET_MODE
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -58,11 +73,16 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
+                data_updated = False
                 while hass.data[UPDATE_DATA].qsize() > 0:
+                    data_updated = True
                     update_data = hass.data[UPDATE_DATA].get()
                     _LOGGER.debug(f"Updating data: {update_data}")
                     result = await hass.async_add_executor_job(api.set_status, update_data.command, update_data.value, update_data.device_name)
                     _LOGGER.debug("Data updated successfully.")
+
+                if data_updated:
+                    asyncio.sleep(0.5)
 
                 await hass.async_add_executor_job(api.refresh_status)
                 _LOGGER.debug(
@@ -135,12 +155,14 @@ class JciHitachiClimateEntity(ClimateEntity, JciHitachiEntity):
     @property
     def max_temp(self):
         """Return the maximum temperature."""
-        return 32
+        status = self.coordinator.data[self._peripheral.name]
+        return status.max_temp
     
     @property
     def min_temp(self):
         """Return the minimum temperature."""
-        return 16
+        status = self.coordinator.data[self._peripheral.name]
+        return status.min_temp
 
     @property
     def hvac_mode(self):
@@ -165,6 +187,28 @@ class JciHitachiClimateEntity(ClimateEntity, JciHitachiEntity):
     @property
     def hvac_modes(self):
         return SUPPORT_HVAC
+    
+    @property
+    def preset_mode(self):
+        status = self.coordinator.data[self._peripheral.name]
+        if status:
+            if status.energy_save == "enabled" and status.mold_prev == "enabled":
+                return PRESET_ECO_MOLD_PREVENTION
+            elif status.energy_save == "enabled":
+                return PRESET_ECO
+            elif status.mold_prev == "enabled":
+                return PRESET_MOLD_PREVENTION
+            elif status.fast_op == "enabled":
+                return PRESET_BOOST
+            else:
+                return PRESET_NONE
+
+        _LOGGER.error("Missing preset_mode")
+        return None
+
+    @property
+    def preset_modes(self):
+        return SUPPORT_PRESET
 
     @property
     def fan_mode(self):
@@ -186,18 +230,7 @@ class JciHitachiClimateEntity(ClimateEntity, JciHitachiEntity):
     @property
     def fan_modes(self):
         return SUPPORT_FAN
-
-    async def update(self, command, value, device_name):
-        self.coordinator.hass.data[UPDATE_DATA].put(
-            UpdateData(
-                command,
-                value,
-                device_name)
-        )
-        await self.coordinator.async_request_refresh()
-
-        return True
-
+   
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
 
@@ -205,29 +238,60 @@ class JciHitachiClimateEntity(ClimateEntity, JciHitachiEntity):
 
         status = self.coordinator.data[self._peripheral.name]
         if status.power == "off" and hvac_mode != HVAC_MODE_OFF:
-            ret = await self.update("power", 1, self._peripheral.name)
-            if not ret:
-                _LOGGER.error("Powering on device failed.")
-                return
+            await self.update("power", 1, self._peripheral.name)
 
         if hvac_mode == HVAC_MODE_OFF:
-            ret = await self.update("power", 0, self._peripheral.name)
+            await self.update("power", 0, self._peripheral.name)
         elif hvac_mode == HVAC_MODE_COOL:
-            ret = await self.update("mode", 0, self._peripheral.name)
+            await self.update("mode", 0, self._peripheral.name)
         elif hvac_mode == HVAC_MODE_DRY:
-            ret = await self.update("mode", 1, self._peripheral.name)
+            await self.update("mode", 1, self._peripheral.name)
         elif hvac_mode == HVAC_MODE_FAN_ONLY:
-            ret = await self.update("mode", 2, self._peripheral.name)
+            await self.update("mode", 2, self._peripheral.name)
         elif hvac_mode == HVAC_MODE_AUTO:
-            ret = await self.update("mode", 3, self._peripheral.name)
+            await self.update("mode", 3, self._peripheral.name)
         elif hvac_mode == HVAC_MODE_HEAT:
-            ret = await self.update("mode", 4, self._peripheral.name)
+            await self.update("mode", 4, self._peripheral.name)
         else:
-            ret = False
             _LOGGER.error("Invalid hvac_mode.")
+
+        ret = await self.refresh()
 
         if not ret:
             _LOGGER.error("Setting hvac_mode failed.")
+
+    async def async_set_preset_mode(self, preset_mode):
+        """Set new target preset mode."""
+
+        _LOGGER.debug(f"Set {self.name} preset_mode to {preset_mode}")
+        
+        if preset_mode == PRESET_ECO_MOLD_PREVENTION:
+            await self.update("energy_save", 1, self._peripheral.name)
+            await self.update("mold_prev", 1, self._peripheral.name)
+            await self.update("fast_op", 0, self._peripheral.name)
+        elif preset_mode == PRESET_ECO:
+            await self.update("energy_save", 1, self._peripheral.name)
+            await self.update("mold_prev", 0, self._peripheral.name)
+            await self.update("fast_op", 0, self._peripheral.name)
+        elif preset_mode == PRESET_MOLD_PREVENTION:
+            await self.update("energy_save", 0, self._peripheral.name)
+            await self.update("mold_prev", 1, self._peripheral.name)
+            await self.update("fast_op", 0, self._peripheral.name)
+        elif preset_mode == PRESET_BOOST:
+            await self.update("energy_save", 0, self._peripheral.name)
+            await self.update("mold_prev", 0, self._peripheral.name)
+            await self.update("fast_op", 1, self._peripheral.name)
+        elif preset_mode == PRESET_NONE:
+            await self.update("energy_save", 0, self._peripheral.name)
+            await self.update("mold_prev", 0, self._peripheral.name)
+            await self.update("fast_op", 0, self._peripheral.name)
+        else:
+            _LOGGER.error("Invalid preset_mode.")
+
+        ret = await self.refresh()
+
+        if not ret:
+            _LOGGER.error("Setting preset_mode failed.")
 
     async def async_set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
@@ -235,16 +299,17 @@ class JciHitachiClimateEntity(ClimateEntity, JciHitachiEntity):
         _LOGGER.debug(f"Set {self.name} fan_mode to {fan_mode}")
 
         if fan_mode == FAN_AUTO:
-            ret = await self.update("air_speed", 0, self._peripheral.name)
+            await self.update("air_speed", 0, self._peripheral.name)
         elif fan_mode == FAN_LOW:
-            ret = await self.update("air_speed", 1, self._peripheral.name)
+            await self.update("air_speed", 1, self._peripheral.name)
         elif fan_mode == FAN_MEDIUM:
-            ret = await self.update("air_speed", 3, self._peripheral.name)
+            await self.update("air_speed", 3, self._peripheral.name)
         elif fan_mode == FAN_HIGH:
-            ret = await self.update("air_speed", 4, self._peripheral.name)
+            await self.update("air_speed", 4, self._peripheral.name)
         else:
-            ret = False
             _LOGGER.error("Invalid fan_mode.")
+
+        ret = await self.refresh()
 
         if not ret:
             _LOGGER.error("Setting fan_mode failed.")
@@ -261,7 +326,9 @@ class JciHitachiClimateEntity(ClimateEntity, JciHitachiEntity):
         # Limit the target temperature into acceptable range.
         target_temp = min(self.max_temp, target_temp)
         target_temp = max(self.min_temp, target_temp)
-        ret = await self.update("target_temp", target_temp, self._peripheral.name)
+        await self.update("target_temp", target_temp, self._peripheral.name)
+
+        ret = await self.refresh()
 
         if not ret:
             _LOGGER.error("Setting temperature failed.")
