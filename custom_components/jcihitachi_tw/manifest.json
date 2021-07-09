@@ -3,7 +3,7 @@
   "name": "jcihitachi_tw",
   "version": "0.0.2",
   "documentation": "https://github.com/qqaatw/JciHitachiHA",
-  "requirements": ["LibJciHitachi==0.0.5"],
+  "requirements": ["LibJciHitachi==0.0.6"],
   "codeowners": ["qqaatw"],
   "iot_class": "cloud_polling"
 }

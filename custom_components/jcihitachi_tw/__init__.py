@@ -16,11 +16,12 @@ _LOGGER = logging.getLogger(__name__)
 DOMAIN = "jcihitachi_tw"
 API = "api"
 UPDATE_DATA = "update_data"
+UPDATED_DATA = "updated_data"
 
 CONF_RETRY = "retry"
 DEFAULT_RETRY = 5
 DEFAULT_DEVICES = []
-PLATFORMS = ["climate"]
+PLATFORMS = ["climate", "sensor"]
 
 
 CONFIG_SCHEMA = vol.Schema(
@@ -70,6 +71,7 @@ def setup(hass, config):
 
     hass.data[API] = api
     hass.data[UPDATE_DATA] = Queue()
+    hass.data[UPDATED_DATA] = dict()
 
     # Start jcihitachi components
     if hass.data[API]:
@@ -108,9 +110,9 @@ class JciHitachiEntity(CoordinatorEntity):
     @property
     def unique_id(self):
         """Return the peripheral's unique id."""
-        return self._peripheral.gateway_mac_address
+        raise NotImplementedError
     
-    async def update(self, command, value, device_name):
+    async def put_queue(self, command, value, device_name):
         self.coordinator.hass.data[UPDATE_DATA].put(
             UpdateData(
                 command,
@@ -119,6 +121,6 @@ class JciHitachiEntity(CoordinatorEntity):
             )
         )
     
-    async def refresh(self):
+    async def async_update(self):
         await self.coordinator.async_request_refresh()
         return True
