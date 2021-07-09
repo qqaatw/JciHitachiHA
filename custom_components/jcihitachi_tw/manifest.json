@@ -1,7 +1,7 @@
 {
   "domain": "jcihitachi_tw",
   "name": "jcihitachi_tw",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "documentation": "https://github.com/qqaatw/JciHitachiHA",
   "requirements": ["LibJciHitachi==0.0.6"],
   "codeowners": ["qqaatw"],
