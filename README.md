@@ -20,6 +20,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Air speed 風速
   - Target temperature 目標溫度
   - Indoor temperature 室內溫度
+  - Outdoor temperature 室外溫度
   - Mold prevention 機體防霉
   - Energy saving 節電
   - Fast operation 快速運轉
