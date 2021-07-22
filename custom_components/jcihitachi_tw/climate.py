@@ -71,16 +71,16 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
-            async with async_timeout.timeout(10):
-                data_updated = False
+            async with async_timeout.timeout(15):
+                is_updated = False
                 while hass.data[UPDATE_DATA].qsize() > 0:
-                    data_updated = True
+                    is_updated = True
                     update_data = hass.data[UPDATE_DATA].get()
                     _LOGGER.debug(f"Updating data: {update_data}")
                     result = await hass.async_add_executor_job(api.set_status, update_data.command, update_data.value, update_data.device_name)
                     _LOGGER.debug("Data updated successfully.")
 
-                if data_updated:
+                if is_updated:
                     asyncio.sleep(0.5)
 
                 await hass.async_add_executor_job(api.refresh_status)
@@ -89,6 +89,9 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                 
                 hass.data[UPDATED_DATA] = api.get_status()
                 return hass.data[UPDATED_DATA]
+
+        except asyncio.TimeoutError as err:
+            _LOGGER.error(f"Command executed timed out.")
 
         except Exception as err:
             _LOGGER.error(f"Error communicating with API: {err}")
