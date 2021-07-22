@@ -10,6 +10,8 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 3. Configure your email address, password, and device names, in `config/configuration.yaml`. If device names are not provided, they will be fetched form the API automatically. (not suggested.)
 4. Restart Home Assistant.
 
+*An example of `configuration.yaml` can be found [here](configuration.yaml).*
+
 ## Supported devices
 
 *支援以下使用日立雲端模組(雲端智慧控)的機種與功能*
@@ -28,20 +30,19 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 - ~~Hitachi Dehumidifier 日立除濕機~~ (Under development)
 - ~~Hitachi HeatExchanger 日立全熱交換機~~ (Under development)
 
-*An example of `configuration.yaml` can be found [here](configuration.yaml).*
-
 ## Tested devices
 
 - RAD-90NJF / RAC-90NK1
 - RAC-63NK
 - RAS-50NJF / RAC-50NK
 - RAS-36NJF / RAC-36NK
+- RAS-36NK  / RAC-36NK1
 - RAS-28NJF / RAC-28NK
 
 ## Known issues
 
 1. Delayed state update.
-    - When a device state has been changed by user, the updated state reported by the API might be delayed for 1~5 sec. So, the user have to wait for it until the state bacomes stable.
+    - When a device state has been changed by user, the updated state reported by the API might be delayed for 1~5 sec. So, the user has to wait for it until the state bacomes stable.
 
 ## License
 
