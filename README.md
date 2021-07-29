@@ -7,7 +7,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 1. Create `config/custom_components` folder if not existing.
 2. Copy `jcihitachi_tw` into `custom_components` folder.
-3. Configure your email address, password, and device names, in `config/configuration.yaml`. If device names are not provided, they will be fetched form the API automatically. (not suggested.)
+3. Configure your email address, password, and device names, in `config/configuration.yaml`. If device names are not provided, they will be fetched from the API automatically. (not recommended.)
 4. Restart Home Assistant.
 
 *An example of `configuration.yaml` can be found [here](configuration.yaml).*
@@ -41,8 +41,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 ## Known issues
 
-1. Delayed state update.
-    - When a device state has been changed by user, the updated state reported by the API might be delayed for 1~5 sec. So, the user has to wait for it until the state bacomes stable.
+  Currently none.
 
 ## License
 
