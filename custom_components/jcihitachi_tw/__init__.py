@@ -171,9 +171,9 @@ class JciHitachiEntity(CoordinatorEntity):
                 _LOGGER.debug("Data updated successfully.")
 
         api.refresh_status()
+        self.hass.data[UPDATED_DATA] = api.get_status()
         _LOGGER.debug(
                f"Latest data: {[(name, value.status) for name, value in self.hass.data[UPDATED_DATA].items()]}")
-        self.hass.data[UPDATED_DATA] = api.get_status()
         
         # Important: We have to reset the update scheduler to prevent old status from wrongly being loaded. 
         self.coordinator.async_set_updated_data(None)
