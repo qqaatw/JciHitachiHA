@@ -1,12 +1,9 @@
 import logging
 
-from homeassistant.const import(
-    DEVICE_CLASS_TEMPERATURE,
-    TEMP_CELSIUS
-)
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.const import DEVICE_CLASS_TEMPERATURE, TEMP_CELSIUS
 
-from . import API, UPDATED_DATA
+from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,18 +11,18 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     """Set up the sensor platform."""
     
     api = hass.data[API]
+    coordinator = hass.data[COORDINATOR]
 
     for peripheral in api.peripherals.values():
         if peripheral.type == "AC":
             async_add_entities(
-                [JciHitachiOutdoorTempSensorEnitty(peripheral)],
+                [JciHitachiOutdoorTempSensorEnitty(peripheral, coordinator)],
                 update_before_add=True)
     
 
-class JciHitachiOutdoorTempSensorEnitty(SensorEntity):
-    def __init__(self, peripheral):
-        self._peripheral = peripheral
-        self._init = False
+class JciHitachiOutdoorTempSensorEnitty(JciHitachiEntity, SensorEntity):
+    def __init__(self, peripheral, coordinator):
+        super().__init__(peripheral, coordinator)
     
     @property
     def name(self):
@@ -53,9 +50,3 @@ class JciHitachiOutdoorTempSensorEnitty(SensorEntity):
     @property
     def unique_id(self):
         return f"{self._peripheral.gateway_mac_address}_outdoor_temp_sensor"
-
-    def update(self):
-        _LOGGER.debug(f"Update {self.name} sensor data.")
-        while not self._init:
-            if self.hass.data[UPDATED_DATA].get(self._peripheral.name, None):
-                self._init = True
