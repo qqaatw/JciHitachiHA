@@ -1,9 +1,10 @@
 """JciHitachi integration."""
 import asyncio
 import async_timeout
-from datetime import timedelta
 import logging
+from datetime import timedelta
 from queue import Queue
+from typing import NamedTuple
 
 import voluptuous as vol
 
@@ -125,19 +126,6 @@ async def async_setup(hass, config):
     return True
 
 
-class UpdateData:
-    def __init__(self, command, value, device_name):
-        self.command = command
-        self.value = value
-        self.device_name = device_name
-    
-    def __iter__(self):
-        return iter((self.command, self.value, self.device_name))
-
-    def __repr__(self):
-        return str(self.__dict__)
-    
-
 class JciHitachiEntity(CoordinatorEntity):
     def __init__(self, peripheral, coordinator):
         super().__init__(coordinator)
@@ -177,3 +165,9 @@ class JciHitachiEntity(CoordinatorEntity):
         
         # Important: We have to reset the update scheduler to prevent old status from wrongly being loaded. 
         self.coordinator.async_set_updated_data(None)
+
+
+class UpdateData(NamedTuple):
+    command : str
+    value : int
+    device_name : str
