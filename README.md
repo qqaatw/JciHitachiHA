@@ -1,5 +1,9 @@
 # Jci-Hitachi Home Assistant Integration
 
+**Help wanted: I've been developing dehumidifier and heat exchanger supports, but I've no such device to test their functionality. If you want to help with the development, please contact me via email: `qqaatw[a-t]gmail.com`. Thank you.**
+
+**Help wanted: 我目前正在開發支援除濕機以及全熱交換機，但是沒有裝置可以測試。若您願意協助此功能的開發，請透過email: `qqaatw[a-t]gmail.com` 聯繫我。Thank you.**
+
 ## Feature
 A home assistant integration for controlling Jci Hitachi devices, using [LibJciHitachi](https://github.com/qqaatw/LibJciHitachi) backend.
 
