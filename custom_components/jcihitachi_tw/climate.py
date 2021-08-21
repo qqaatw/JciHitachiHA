@@ -9,6 +9,10 @@ from homeassistant.components.climate.const import (
     FAN_HIGH,
     FAN_LOW,
     FAN_MEDIUM,
+    SWING_OFF,
+    SWING_VERTICAL,
+    SWING_HORIZONTAL,
+    SWING_BOTH,
     HVAC_MODE_AUTO,
     HVAC_MODE_COOL,
     HVAC_MODE_DRY,
@@ -20,7 +24,8 @@ from homeassistant.components.climate.const import (
     PRESET_ECO,
     SUPPORT_FAN_MODE,
     SUPPORT_TARGET_TEMPERATURE,
-    SUPPORT_PRESET_MODE
+    SUPPORT_PRESET_MODE,
+    SUPPORT_SWING_MODE
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 
@@ -32,6 +37,12 @@ PRESET_MOLD_PREVENTION = "Mold Prev"
 PRESET_ECO_MOLD_PREVENTION = "Eco & Mold Prev"
 
 SUPPORT_FAN = [FAN_AUTO, FAN_LOW, FAN_MEDIUM, FAN_HIGH]
+SUPPORT_SWING = [
+    SWING_OFF,
+    SWING_VERTICAL,
+    SWING_HORIZONTAL,
+    SWING_BOTH
+]
 SUPPORT_HVAC = [
     HVAC_MODE_OFF,
     HVAC_MODE_COOL,
@@ -47,7 +58,6 @@ SUPPORT_PRESET = [
     PRESET_MOLD_PREVENTION,
     PRESET_ECO_MOLD_PREVENTION
 ]
-SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE | SUPPORT_PRESET_MODE
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -58,20 +68,24 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     for peripheral in api.peripherals.values():
         if peripheral.type == "AC":
+            status = hass.data[UPDATED_DATA][peripheral.name]
+            support_features = JciHitachiClimateEntity.calculate_supported_features(status)
             async_add_entities(
-                [JciHitachiClimateEntity(peripheral, coordinator)],
+                [JciHitachiClimateEntity(
+                    peripheral, coordinator, support_features)],
                 update_before_add=True
             )
 
 
 class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
-    def __init__(self, peripheral, coordinator):
+    def __init__(self, peripheral, coordinator, supported_features):
         super().__init__(peripheral, coordinator)
+        self._supported_features = supported_features
 
     @property
     def supported_features(self):
         """Return the list of supported features."""
-        return SUPPORT_FLAGS
+        return self._supported_features
 
     @property
     def temperature_unit(self):
@@ -179,9 +193,37 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         return SUPPORT_FAN
     
     @property
+    def swing_mode(self):
+        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        if status:
+            if status.vertical_wind_swingable == "enabled" and \
+                status.horizontal_wind_direction == "auto":
+                return SWING_BOTH
+            elif status.vertical_wind_swingable == "enabled":
+                return SWING_VERTICAL
+            elif status.horizontal_wind_direction == "auto":
+                return SWING_HORIZONTAL
+            else:
+                return SWING_OFF
+        _LOGGER.error("Missing swing_mode.")
+        return None
+
+    @property
+    def swing_modes(self):
+        return SUPPORT_SWING
+
+    @property
     def unique_id(self):
         return f"{self._peripheral.gateway_mac_address}_climate"
-   
+
+    @staticmethod
+    def calculate_supported_features(status):
+        support_flags = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE | SUPPORT_PRESET_MODE
+        if status.horizontal_wind_direction != "unsupported" and \
+                status.vertical_wind_swingable != "unsupported":
+            support_flags |= SUPPORT_SWING_MODE
+        return support_flags
+
     def set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
 
@@ -253,6 +295,27 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
             _LOGGER.error("Invalid fan_mode.")
         self.update()
 
+    def set_swing_mode(self, swing_mode):
+        """Set swing mode."""
+
+        _LOGGER.debug(f"Set {self.name} swing_mode to {swing_mode}")
+
+        if swing_mode == SWING_OFF:
+            self.put_queue("vertical_wind_swingable", 0, self._peripheral.name)
+            self.put_queue("horizontal_wind_direction", 3, self._peripheral.name)
+        elif swing_mode == SWING_VERTICAL:
+            self.put_queue("vertical_wind_swingable", 1, self._peripheral.name)
+            self.put_queue("horizontal_wind_direction", 3, self._peripheral.name)
+        elif swing_mode == SWING_HORIZONTAL:
+            self.put_queue("vertical_wind_swingable", 0, self._peripheral.name)
+            self.put_queue("horizontal_wind_direction", 0, self._peripheral.name)
+        elif swing_mode == SWING_BOTH:
+            self.put_queue("vertical_wind_swingable", 1, self._peripheral.name)
+            self.put_queue("horizontal_wind_direction", 0, self._peripheral.name)
+        else:
+            _LOGGER.error("Invalid swing_mode.")
+        self.update()
+
     def set_temperature(self, **kwargs):
         """Set new target temperature."""
         target_temp = kwargs.get(ATTR_TEMPERATURE)
@@ -261,7 +324,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
             return
 
         target_temp = int(target_temp)
-        _LOGGER.debug("Set %s temperature %s", self.name, target_temp)
+        _LOGGER.debug(f"Set {self.name} temperature to {target_temp}")
         # Limit the target temperature into acceptable range.
         target_temp = min(self.max_temp, target_temp)
         target_temp = max(self.min_temp, target_temp)
