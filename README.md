@@ -24,12 +24,16 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Power 電源
   - Mode 運轉模式
   - Air speed 風速
+  - Vertical wind swingable 導風板垂直擺動 (Untested)
+  - Vertical wind direction 導風板垂直方向 (Untested)
+  - Horizontal wind direction 導風板水平方向 (Untested)
   - Target temperature 目標溫度
   - Indoor temperature 室內溫度
   - Outdoor temperature 室外溫度
   - Mold prevention 機體防霉
   - Energy saving 節電
   - Fast operation 快速運轉
+  - Power consumption 用電統計 (supports HA core v2021.9.0+)
   - ~~Sleep timer 睡眠計時器~~ (Only supported by LibJciHitachi)
 - ~~Hitachi Dehumidifier 日立除濕機~~ (Under development)
 - ~~Hitachi HeatExchanger 日立全熱交換機~~ (Under development)
