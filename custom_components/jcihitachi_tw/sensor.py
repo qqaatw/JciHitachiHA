@@ -1,6 +1,6 @@
 import logging
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, STATE_CLASS_TOTAL_INCREASING
 from homeassistant.const import (
     DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_TEMPERATURE,
@@ -91,4 +91,4 @@ class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
 
     @property
     def state_class(self):
-        return "total_increasing"
+        return STATE_CLASS_TOTAL_INCREASING
