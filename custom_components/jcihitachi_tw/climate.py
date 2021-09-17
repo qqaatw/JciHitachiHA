@@ -224,6 +224,10 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
             support_flags |= SUPPORT_SWING_MODE
         return support_flags
 
+    def turn_on(self):
+        self.put_queue("power", 1, self._peripheral.name)
+        self.update()
+        
     def set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
 
