@@ -50,7 +50,7 @@ CONFIG_SCHEMA = vol.Schema(
 async def async_setup(hass, config):
     _LOGGER.debug(
         f"CONF_EMAIL: {config[DOMAIN].get(CONF_EMAIL)}, \
-          CONF_PASSWORD: {''.join(['*']*len(config[DOMAIN].get(CONF_EMAIL)))}, \
+          CONF_PASSWORD: {''.join(['*']*len(config[DOMAIN].get(CONF_PASSWORD)))}, \
           CONF_RETRY: {config[DOMAIN].get(CONF_RETRY)}, \
           CONF_DEVICES: {config[DOMAIN].get(CONF_DEVICES)}"
     )
