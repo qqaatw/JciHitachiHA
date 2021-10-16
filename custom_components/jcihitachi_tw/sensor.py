@@ -21,12 +21,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     for peripheral in api.peripherals.values():
         if peripheral.type == "AC":
             async_add_entities(
-                [JciHitachiOutdoorTempSensorEnitty(peripheral, coordinator),
+                [JciHitachiOutdoorTempSensorEntity(peripheral, coordinator),
                  JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
                 update_before_add=True)
     
 
-class JciHitachiOutdoorTempSensorEnitty(JciHitachiEntity, SensorEntity):
+class JciHitachiOutdoorTempSensorEntity(JciHitachiEntity, SensorEntity):
     def __init__(self, peripheral, coordinator):
         super().__init__(peripheral, coordinator)
     
