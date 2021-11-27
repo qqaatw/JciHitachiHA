@@ -11,14 +11,14 @@ from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-MODE_AUTO = "auto"
-MODE_CUSTOM = "custom"
-MODE_CONTINUOUS = "continuous"
-MODE_CLOTHES_DRY = "clothes_dry"
-MODE_AIR_PURIFY = "air_purify"
-MODE_MOLD_PREV = "mold_prev"
-MODE_LOW_HUMIDITY = "low_humidity"
-MODE_ECO_COMFORT = "eco_comfort"
+MODE_AUTO = "Auto"
+MODE_CUSTOM = "Custom"
+MODE_CONTINUOUS = "Continuous"
+MODE_CLOTHES_DRY = "Clothes Dry"
+MODE_AIR_PURIFY = "Air Purify"
+MODE_MOLD_PREV = "Mold Prev"
+MODE_LOW_HUMIDITY = "Low Humidity"
+MODE_ECO_COMFORT = "Eco Comfort"
 
 AVAILABLE_MODES = [
     MODE_AUTO,

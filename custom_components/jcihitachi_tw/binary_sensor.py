@@ -58,7 +58,7 @@ class JciHitachiWaterFullBinarySensorEntity(JciHitachiEntity, BinarySensorEntity
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} Water full Warning"
+        return f"{self._peripheral.name} Water Full Warning"
 
     @property
     def is_on(self):
