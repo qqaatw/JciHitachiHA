@@ -30,7 +30,7 @@ UPDATED_DATA = "updated_data"
 CONF_RETRY = "retry"
 DEFAULT_RETRY = 5
 DEFAULT_DEVICES = []
-PLATFORMS = ["climate", "sensor"]
+PLATFORMS = ["binary_sensor", "climate", "humidifier", "sensor"]
 
 
 CONFIG_SCHEMA = vol.Schema(

@@ -225,6 +225,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         return support_flags
 
     def turn_on(self):
+        """Turn the device on."""
         self.put_queue("power", 1, self._peripheral.name)
         self.update()
         
