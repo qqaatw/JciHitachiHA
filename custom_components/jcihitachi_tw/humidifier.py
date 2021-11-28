@@ -41,11 +41,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     for peripheral in api.peripherals.values():
         if peripheral.type == "DH":
             status = hass.data[UPDATED_DATA][peripheral.name]
-            support_features = JciHitachiDehumidifierEntity.calculate_supported_features(
-                status)
+            supported_features = JciHitachiDehumidifierEntity.calculate_supported_features(
+                status
+            )
             async_add_entities(
                 [JciHitachiDehumidifierEntity(
-                    peripheral, coordinator, support_features)],
+                    peripheral, coordinator, supported_features)],
                 update_before_add=True
             )
 
