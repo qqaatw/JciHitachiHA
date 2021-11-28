@@ -10,6 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 ORDERED_NAMED_FAN_SPEEDS = ["silent", "low", "moderate", "high"]
 
+
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the fan platform."""
 
@@ -78,7 +79,8 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     
     def set_percentage(self, percentage):
         """Set the speed percentage of the fan."""
-        air_speed = percentage_to_ordered_list_item(percentage)
+        air_speed = percentage_to_ordered_list_item(
+            ORDERED_NAMED_FAN_SPEEDS, percentage)
         
         _LOGGER.debug(f"Set {self.name} air speed to {air_speed}")
 
@@ -96,10 +98,12 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
 
     def turn_on(self, **kwargs):
         """Turn the device on."""
+        _LOGGER.debug(f"Turn {self.name} on")
         self.put_queue("power", 1, self._peripheral.name)
         self.update()
 
     def turn_off(self, **kwargs):
         """Turn the device off."""
+        _LOGGER.debug(f"Turn {self.name} off")
         self.put_queue("power", 0, self._peripheral.name)
         self.update()

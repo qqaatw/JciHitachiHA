@@ -1,3 +1,4 @@
+"""JciHitachi integration."""
 import logging
 
 from homeassistant.components.sensor import SensorEntity, STATE_CLASS_TOTAL_INCREASING
@@ -15,6 +16,7 @@ from homeassistant.const import (
 from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
+
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""

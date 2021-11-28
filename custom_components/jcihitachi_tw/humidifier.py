@@ -23,7 +23,7 @@ MODE_ECO_COMFORT = "Eco Comfort"
 AVAILABLE_MODES = [
     MODE_AUTO,
     MODE_CUSTOM,
-    MODE_CONTINUOUS,
+    #MODE_CONTINUOUS, # not existing in Hitachi app interface
     MODE_CLOTHES_DRY,
     MODE_AIR_PURIFY,
     MODE_MOLD_PREV,
@@ -170,11 +170,13 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     
     def turn_on(self, **kwargs):
         """Turn the device on."""
+        _LOGGER.debug(f"Turn {self.name} on")
         self.put_queue("power", 1, self._peripheral.name)
         self.update()
     
     def turn_off(self, **kwargs):
         """Turn the device off."""
+        _LOGGER.debug(f"Turn {self.name} off")
         self.put_queue("power", 0, self._peripheral.name)
         self.update()
 
