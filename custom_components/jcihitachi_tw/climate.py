@@ -69,10 +69,10 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     for peripheral in api.peripherals.values():
         if peripheral.type == "AC":
             status = hass.data[UPDATED_DATA][peripheral.name]
-            support_features = JciHitachiClimateEntity.calculate_supported_features(status)
+            supported_features = JciHitachiClimateEntity.calculate_supported_features(status)
             async_add_entities(
                 [JciHitachiClimateEntity(
-                    peripheral, coordinator, support_features)],
+                    peripheral, coordinator, supported_features)],
                 update_before_add=True
             )
 
@@ -163,7 +163,6 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
                 return PRESET_BOOST
             else:
                 return PRESET_NONE
-
         _LOGGER.error("Missing preset_mode")
         return None
 
@@ -225,6 +224,8 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         return support_flags
 
     def turn_on(self):
+        """Turn the device on."""
+        _LOGGER.debug(f"Turn {self.name} on")
         self.put_queue("power", 1, self._peripheral.name)
         self.update()
         
