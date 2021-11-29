@@ -17,6 +17,10 @@ from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+ODOR_LEVEL_LOW = "Low"
+ODOR_LEVEL_MIDDLE = "Middle"
+ODOR_LEVEL_HIGH = "High"
+
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
@@ -33,6 +37,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         elif peripheral.type == "DH":
             async_add_entities(
                 [JciHitachiIndoorHumiditySensorEntity(peripheral, coordinator),
+                 JciHitachiOdorLevelSensorEntity(peripheral, coordinator),
                  JciHitachiPM25SensorEntity(peripheral, coordinator),
                  JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
                 update_before_add=True)
@@ -100,6 +105,33 @@ class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def unique_id(self):
         return f"{self._peripheral.gateway_mac_address}_pm25_sensor"
+
+
+class JciHitachiOdorLevelSensorEntity(JciHitachiEntity, SensorEntity):
+    def __init__(self, peripheral, coordinator):
+        super().__init__(peripheral, coordinator)
+
+    @property
+    def name(self):
+        """Return the name of the entity."""
+        return f"{self._peripheral.name} Odor Level"
+
+    @property
+    def state(self):
+        """Return the odor level."""
+        status = self.hass.data[UPDATED_DATA].get(self._peripheral.name, None)
+        if status:
+            if status.odor_level == "low":
+                return ODOR_LEVEL_LOW
+            elif status.odor_level == "middle":
+                return ODOR_LEVEL_MIDDLE
+            elif status.odor_level == "high":
+                return ODOR_LEVEL_HIGH
+        return None
+
+    @property
+    def unique_id(self):
+        return f"{self._peripheral.gateway_mac_address}_odor_level_sensor"
 
 
 class JciHitachiOutdoorTempSensorEntity(JciHitachiEntity, SensorEntity):
