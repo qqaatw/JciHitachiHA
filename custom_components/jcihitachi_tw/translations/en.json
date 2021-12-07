@@ -1,0 +1,21 @@
+{
+    "config": {
+        "flow_title": "JciHitachi TW",
+        "step": {
+            "user": {
+                "data": {
+                    "email": "JciHitachi Email",
+                    "password": "JciHitachi Password",
+                    "devices": "Device names",
+                    "retry": "Retry"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Failed to connect"
+        },
+        "abort": {
+            "already_configured": "Device already configured"
+        }
+    }
+}

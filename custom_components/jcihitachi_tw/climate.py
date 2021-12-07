@@ -77,6 +77,24 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             )
 
 
+async def async_setup_entry(hass, config_entry, async_add_devices):
+    """Set up the climate platform from a config entry."""
+
+    api = hass.data[API]
+    coordinator = hass.data[COORDINATOR]
+
+    for peripheral in api.peripherals.values():
+        if peripheral.type == "AC":
+            status = hass.data[UPDATED_DATA][peripheral.name]
+            supported_features = JciHitachiClimateEntity.calculate_supported_features(
+                status)
+            async_add_devices(
+                [JciHitachiClimateEntity(
+                    peripheral, coordinator, supported_features)],
+                update_before_add=True
+            )
+
+
 class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     def __init__(self, peripheral, coordinator, supported_features):
         super().__init__(peripheral, coordinator)
