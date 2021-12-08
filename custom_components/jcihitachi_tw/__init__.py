@@ -18,6 +18,7 @@ from JciHitachi.api import JciHitachiAPI
 
 from .const import (
     CONF_RETRY,
+    CONFIG_SCHEMA,
     DOMAIN,
     API,
     COORDINATOR,
@@ -32,7 +33,7 @@ DATA_UPDATE_INTERVAL = timedelta(seconds=30)
 
 
 async def async_setup(hass, config):
-    if config[DOMAIN].get(CONF_EMAIL) is None:
+    if config.get(DOMAIN, None) is None:
         return True
     _LOGGER.debug(
         {
@@ -61,7 +62,7 @@ async def async_setup(hass, config):
     try:
         await hass.async_add_executor_job(api.login)
     except AssertionError as err:
-        _LOGGER.error(f"Encountered assertion error: {err}")
+        _LOGGER.error(f"Assertion check error: {err}")
         return False
     except RuntimeError as err:
         _LOGGER.error(f"Failed to login API: {err}")
@@ -145,7 +146,7 @@ async def async_setup_entry(hass, config_entry):
     try:
         await hass.async_add_executor_job(api.login)
     except AssertionError as err:
-        _LOGGER.error(f"Encountered assertion error: {err}")
+        _LOGGER.error(f"Assertion check error: {err}")
         return False
     except RuntimeError as err:
         _LOGGER.error(f"Failed to login API: {err}")
@@ -176,7 +177,7 @@ async def async_setup_entry(hass, config_entry):
         _LOGGER.debug(
             f"Latest data: {[(name, value.status) for name, value in hass.data[UPDATED_DATA].items()]}")
 
-    async def _async_forward_entry_setup():
+    def _async_forward_entry_setup():
         for platform in PLATFORMS:
             hass.async_create_task(
                 hass.config_entries.async_forward_entry_setup(config_entry, platform)
@@ -199,9 +200,7 @@ async def async_setup_entry(hass, config_entry):
     # Start jcihitachi components
     if hass.data[API]:
         _LOGGER.debug("Starting JciHitachi components.")
-        asyncio.run_coroutine_threadsafe(
-            _async_forward_entry_setup(), hass.loop
-        ).result()
+        _async_forward_entry_setup()
     
     # Return boolean to indicate that initialization was successful.
     return True

@@ -1,5 +1,5 @@
 {
-  "config_entry": true,
+  "config_flow": true,
   "domain": "jcihitachi_tw",
   "name": "JciHitachi TW",
   "version": "0.1.1",

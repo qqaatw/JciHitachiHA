@@ -11,8 +11,8 @@ UPDATE_DATA = "update_data"
 UPDATED_DATA = "updated_data"
 
 CONF_RETRY = "retry"
+CONF_ADD_ANOTHER_DEVICE = "add_another_device"
 DEFAULT_RETRY = 5
-DEFAULT_DEVICES = []
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -21,9 +21,26 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Required(CONF_EMAIL): cv.string,
                 vol.Required(CONF_PASSWORD): cv.string,
                 vol.Optional(CONF_RETRY, default=DEFAULT_RETRY): cv.positive_int,
-                vol.Optional(CONF_DEVICES, default=DEFAULT_DEVICES): vol.All(cv.ensure_list, list),
+                vol.Optional(CONF_DEVICES, default=[]): vol.All(cv.ensure_list, list),
             }
         )
     },
     extra=vol.ALLOW_EXTRA,
+)
+
+CONFIG_FLOW_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_EMAIL): cv.string,
+        vol.Required(CONF_PASSWORD): cv.string,
+        vol.Optional(CONF_RETRY, default=DEFAULT_RETRY): cv.positive_int,
+        vol.Optional(CONF_DEVICES, default=""): cv.string,
+        vol.Optional(CONF_ADD_ANOTHER_DEVICE, default=False): cv.boolean,
+    }
+)
+
+CONFIG_FLOW_ADD_DEVICE_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICES, default=""): cv.string,
+        vol.Optional(CONF_ADD_ANOTHER_DEVICE, default=False): cv.boolean,
+    }
 )

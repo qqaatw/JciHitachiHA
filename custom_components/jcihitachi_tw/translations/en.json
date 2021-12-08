@@ -6,13 +6,22 @@
                 "data": {
                     "email": "JciHitachi Email",
                     "password": "JciHitachi Password",
-                    "devices": "Device names",
-                    "retry": "Retry"
+                    "retry": "Number of retries when command sending fails",
+                    "devices": "Device names (Leave blank to automatically retrieve from the API)",
+                    "add_another_device": "Add another device?"
+                }
+            },
+            "add_device": {
+                "data": {
+                    "devices": "Device names (Leave blank to automatically retrieve from the API)",
+                    "add_another_device": "Add another device?"
                 }
             }
         },
         "error": {
-            "cannot_connect": "Failed to connect"
+            "assertion_check_error": "The device(s) you specified is/are not available from the API.",
+            "login_error": "Incorrect email or password.",
+            "unknown_error": "Unknown error occurred."            
         },
         "abort": {
             "already_configured": "Device already configured"
