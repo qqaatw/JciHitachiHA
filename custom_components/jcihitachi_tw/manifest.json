@@ -4,7 +4,8 @@
   "name": "JciHitachi TW",
   "version": "0.1.1",
   "documentation": "https://github.com/qqaatw/JciHitachiHA",
-  "requirements": ["LibJciHitachi @ git+https://github.com/qqaatw/LibJciHitachi.git@develop#egg=LibJciHitachi"],
+  "issue_tracker": "https://github.com/qqaatw/JciHitachiHA/issues",
+  "requirements": ["LibJciHitachi==0.2.1"],
   "codeowners": ["@qqaatw"],
   "iot_class": "cloud_polling"
 }

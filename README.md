@@ -9,6 +9,15 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 ## Installation
 
+### Configuring via UI
+
+1. Create `config/custom_components` folder if not existing.
+2. Copy `jcihitachi_tw` into `custom_components` folder.
+3. Click `Configuration` button on the left side of Home Assistant panel, and then click `Integrations` tab.
+4. Click `ADD INTEGRATION` button at the bottom right corner and follow the UI.
+
+### Configuring via `configuration.yaml`
+
 1. Create `config/custom_components` folder if not existing.
 2. Copy `jcihitachi_tw` into `custom_components` folder.
 3. Configure your email address, password, and device names, in `config/configuration.yaml`. If device names are not provided, they will be fetched from the API automatically. (not recommended.)
