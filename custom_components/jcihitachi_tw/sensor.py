@@ -41,7 +41,27 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                  JciHitachiPM25SensorEntity(peripheral, coordinator),
                  JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
                 update_before_add=True)
-    
+
+
+async def async_setup_entry(hass, config_entry, async_add_devices):
+    """Set up the sensor platform from a config entry."""
+
+    api = hass.data[API]
+    coordinator = hass.data[COORDINATOR]
+
+    for peripheral in api.peripherals.values():
+        if peripheral.type == "AC":
+            async_add_devices(
+                [JciHitachiOutdoorTempSensorEntity(peripheral, coordinator),
+                 JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
+                update_before_add=True)
+        elif peripheral.type == "DH":
+            async_add_devices(
+                [JciHitachiIndoorHumiditySensorEntity(peripheral, coordinator),
+                 JciHitachiOdorLevelSensorEntity(peripheral, coordinator),
+                 JciHitachiPM25SensorEntity(peripheral, coordinator),
+                 JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
+                update_before_add=True)
 
 class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
     def __init__(self, peripheral, coordinator):

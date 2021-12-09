@@ -29,6 +29,24 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                 update_before_add=True)
 
 
+async def async_setup_entry(hass, config_entry, async_add_devices):
+    """Set up the fan platform from a config entry."""
+
+    api = hass.data[API]
+    coordinator = hass.data[COORDINATOR]
+
+    for peripheral in api.peripherals.values():
+        if peripheral.type == "DH":
+            status = hass.data[UPDATED_DATA][peripheral.name]
+            supported_features = JciHitachiDehumidifierFanEntity.calculate_supported_features(
+                status
+            )
+            async_add_devices(
+                [JciHitachiDehumidifierFanEntity(
+                    peripheral, coordinator, supported_features)],
+                update_before_add=True)
+
+
 class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     def __init__(self, peripheral, coordinator, supported_features):
         super().__init__(peripheral, coordinator)

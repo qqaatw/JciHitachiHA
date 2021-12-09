@@ -6,11 +6,7 @@ from datetime import timedelta
 from queue import Queue
 from typing import NamedTuple
 
-import voluptuous as vol
-
-from homeassistant.const import CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD
 from homeassistant.helpers import discovery
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -19,43 +15,40 @@ from homeassistant.helpers.update_coordinator import (
 
 from JciHitachi.api import JciHitachiAPI
 
-_LOGGER = logging.getLogger(__name__)
-
-DOMAIN = "jcihitachi_tw"
-API = "api"
-COORDINATOR = "coordinator"
-UPDATE_DATA = "update_data"
-UPDATED_DATA = "updated_data"
-
-CONF_RETRY = "retry"
-DEFAULT_RETRY = 5
-DEFAULT_DEVICES = []
-PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "sensor", "switch"]
-
-
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_EMAIL): cv.string,
-                vol.Required(CONF_PASSWORD): cv.string,
-                vol.Optional(CONF_RETRY, default=DEFAULT_RETRY): cv.positive_int,
-                vol.Optional(CONF_DEVICES, default=DEFAULT_DEVICES): vol.All(cv.ensure_list, list),
-            }
-        )
-    },
-    extra=vol.ALLOW_EXTRA,
+from .const import (
+    CONF_DEVICES,
+    CONF_EMAIL,
+    CONF_PASSWORD,
+    CONF_RETRY,
+    CONFIG_SCHEMA,
+    DOMAIN,
+    API,
+    COORDINATOR,
+    UPDATE_DATA,
+    UPDATED_DATA,
 )
 
+_LOGGER = logging.getLogger(__name__)
+
+PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "sensor", "switch"]
+DATA_UPDATE_INTERVAL = timedelta(seconds=30)
+
+
 async def async_setup(hass, config):
+    """Set up from the configuration.yaml"""
+    if config.get(DOMAIN, None) is None:
+        # skip if no config defined in configuration.yaml"""
+        return True
     _LOGGER.debug(
-        f"CONF_EMAIL: {config[DOMAIN].get(CONF_EMAIL)}, \
-          CONF_PASSWORD: {''.join(['*']*len(config[DOMAIN].get(CONF_PASSWORD)))}, \
-          CONF_RETRY: {config[DOMAIN].get(CONF_RETRY)}, \
-          CONF_DEVICES: {config[DOMAIN].get(CONF_DEVICES)}"
+        {
+            "CONF_EMAIL": config[DOMAIN].get(CONF_EMAIL),
+            "CONF_PASSWORD": ''.join(['*']*len(config[DOMAIN].get(CONF_PASSWORD))),
+            "CONF_RETRY": config[DOMAIN].get(CONF_RETRY),
+            "CONF_DEVICES": config[DOMAIN].get(CONF_DEVICES)
+        }
     )
 
-    if len(config[DOMAIN].get(CONF_DEVICES)) == 0:
+    if config[DOMAIN].get(CONF_DEVICES) == []:
         config[DOMAIN][CONF_DEVICES] = None
 
     api = JciHitachiAPI(
@@ -73,14 +66,14 @@ async def async_setup(hass, config):
     try:
         await hass.async_add_executor_job(api.login)
     except AssertionError as err:
-        _LOGGER.error(f"Encountered assertion error:{err}")
+        _LOGGER.error(f"Assertion check error: {err}")
         return False
     except RuntimeError as err:
         _LOGGER.error(f"Failed to login API: {err}")
         return False
 
     _LOGGER.debug(
-        f"Peripheral info: {[peripheral for peripheral in api._peripherals.values()]}")
+        f"Peripheral info: {[peripheral for peripheral in api.peripherals.values()]}")
     
     async def async_update_data():
         """Fetch data from API endpoint.
@@ -94,14 +87,15 @@ async def async_setup(hass, config):
             async with async_timeout.timeout(10):
                 await hass.async_add_executor_job(api.refresh_status)
                 hass.data[UPDATED_DATA] = api.get_status()
-                _LOGGER.debug(
-                    f"Latest data: {[(name, value.status) for name, value in hass.data[UPDATED_DATA].items()]}")
 
         except asyncio.TimeoutError as err:
             raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
 
         except Exception as err:
             raise UpdateFailed(f"Error communicating with API: {err}")
+        
+        _LOGGER.debug(
+            f"Latest data: {[(name, value.status) for name, value in hass.data[UPDATED_DATA].items()]}")
 
     coordinator = DataUpdateCoordinator(
         hass,
@@ -110,7 +104,7 @@ async def async_setup(hass, config):
         name=DOMAIN,
         update_method=async_update_data,
         # Polling interval. Will only be polled if there are subscribers.
-        update_interval=timedelta(seconds=30),
+        update_interval=DATA_UPDATE_INTERVAL,
     )
 
     await coordinator.async_refresh()
@@ -119,9 +113,100 @@ async def async_setup(hass, config):
     
     # Start jcihitachi components
     if hass.data[API]:
-        _LOGGER.debug("Starting jcihitachi components.")
+        _LOGGER.debug("Starting JciHitachi components.")
         for platform in PLATFORMS:
             discovery.load_platform(hass, platform, DOMAIN, {}, config)
+
+    # Return boolean to indicate that initialization was successful.
+    return True
+
+async def async_setup_entry(hass, config_entry):
+    """Set up from a config entry."""
+
+    config = config_entry.data[DOMAIN]
+    _LOGGER.debug(
+        {
+            "CONF_EMAIL": config.get(CONF_EMAIL),
+            "CONF_PASSWORD": ''.join(['*']*len(config.get(CONF_PASSWORD))),
+            "CONF_RETRY": config.get(CONF_RETRY),
+            "CONF_DEVICES": config.get(CONF_DEVICES)
+        }
+    )
+
+    if config.get(CONF_DEVICES) == []:
+        config[CONF_DEVICES] = None
+
+    api = JciHitachiAPI(
+        email=config.get(CONF_EMAIL),
+        password=config.get(CONF_PASSWORD),
+        device_names=config.get(CONF_DEVICES),
+        max_retries=config.get(CONF_RETRY),
+    )
+
+    hass.data[API] = api
+    hass.data[UPDATE_DATA] = Queue()
+    hass.data[UPDATED_DATA] = dict()
+    hass.data[COORDINATOR] = None
+
+    try:
+        await hass.async_add_executor_job(api.login)
+    except AssertionError as err:
+        _LOGGER.error(f"Assertion check error: {err}")
+        return False
+    except RuntimeError as err:
+        _LOGGER.error(f"Failed to login API: {err}")
+        return False
+
+    _LOGGER.debug(
+        f"Peripheral info: {[peripheral for peripheral in api.peripherals.values()]}")
+    
+    async def _async_update_data():
+        """Fetch data from API endpoint.
+
+        This is the place to pre-process the data to lookup tables
+        so entities can quickly look up their data.
+        """
+        try:
+            # Note: asyncio.TimeoutError and aiohttp.ClientError are already
+            # handled by the data update coordinator.
+            async with async_timeout.timeout(10):
+                await hass.async_add_executor_job(api.refresh_status)
+                hass.data[UPDATED_DATA] = api.get_status()
+
+        except asyncio.TimeoutError as err:
+            raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
+
+        except Exception as err:
+            raise UpdateFailed(f"Error communicating with API: {err}")
+
+        _LOGGER.debug(
+            f"Latest data: {[(name, value.status) for name, value in hass.data[UPDATED_DATA].items()]}")
+
+    def _async_forward_entry_setup():
+        for platform in PLATFORMS:
+            hass.async_create_task(
+                hass.config_entries.async_forward_entry_setup(config_entry, platform)
+            )
+
+    coordinator = DataUpdateCoordinator(
+        hass,
+        _LOGGER,
+        # Name of the data. For logging purposes.
+        name=DOMAIN,
+        update_method=_async_update_data,
+        # Polling interval. Will only be polled if there are subscribers.
+        update_interval=DATA_UPDATE_INTERVAL,
+    )
+
+    await coordinator.async_refresh()
+
+    hass.data[COORDINATOR] = coordinator
+    
+    # Start jcihitachi components
+    if hass.data[API]:
+        _LOGGER.debug("Starting JciHitachi components.")
+        _async_forward_entry_setup()
+    
     # Return boolean to indicate that initialization was successful.
     return True
 
@@ -130,6 +215,16 @@ class JciHitachiEntity(CoordinatorEntity):
     def __init__(self, peripheral, coordinator):
         super().__init__(coordinator)
         self._peripheral = peripheral
+
+    @property
+    def device_info(self) -> dict:
+        """Return device info of the entity."""
+        return {
+            "identifiers": {(DOMAIN, self._peripheral.gateway_mac_address)},
+            "name": self._peripheral.name,
+            "manufacturer": self._peripheral.brand,
+            "model": self._peripheral.model,
+        }
 
     @property
     def name(self):
@@ -161,7 +256,8 @@ class JciHitachiEntity(CoordinatorEntity):
         api.refresh_status()
         self.hass.data[UPDATED_DATA] = api.get_status()
         _LOGGER.debug(
-               f"Latest data: {[(name, value.status) for name, value in self.hass.data[UPDATED_DATA].items()]}")
+            f"Latest data: {[(name, value.status) for name, value in self.hass.data[UPDATED_DATA].items()]}"
+        )
         
         # Important: We have to reset the update scheduler to prevent old status from wrongly being loaded. 
         self.coordinator.async_set_updated_data(None)
