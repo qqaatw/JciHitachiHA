@@ -7,13 +7,13 @@
                     "email": "JciHitachi Email",
                     "password": "JciHitachi Password",
                     "retry": "Number of retries when command sending fails",
-                    "devices": "Device names (Leave blank to automatically retrieve from the API)",
+                    "devices": "Device name (Leave blank to automatically retrieve from the API)",
                     "add_another_device": "Add another device?"
                 }
             },
             "add_device": {
                 "data": {
-                    "devices": "Device names (Leave blank to automatically retrieve from the API)",
+                    "devices": "Device name (Leave blank to automatically retrieve from the API)",
                     "add_another_device": "Add another device?"
                 }
             }

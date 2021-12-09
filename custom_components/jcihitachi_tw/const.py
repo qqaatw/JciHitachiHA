@@ -40,7 +40,7 @@ CONFIG_FLOW_SCHEMA = vol.Schema(
 
 CONFIG_FLOW_ADD_DEVICE_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_DEVICES, default=""): cv.string,
+        vol.Optional(CONF_DEVICES, default=""): cv.string,
         vol.Optional(CONF_ADD_ANOTHER_DEVICE, default=False): cv.boolean,
     }
 )

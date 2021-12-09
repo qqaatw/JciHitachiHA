@@ -28,6 +28,7 @@ async def validate_auth(hass, email, password, device_names, max_retries) -> Non
     )
     await hass.async_add_executor_job(api.login)
 
+
 class JciHitachiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """JciHitachi config flow."""
     
@@ -37,17 +38,18 @@ class JciHitachiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Initialize the config flow."""
         self.data = None
     
-    async def async_step_user(self, user_input):
+    async def async_step_user(self, user_input=None):
         errors = {}
         if user_input is not None:
             self.data = user_input
-            if user_input[CONF_DEVICES] == "":
-                self.data[CONF_DEVICES] = []
-            else:    
-                self.data[CONF_DEVICES] = [user_input[CONF_DEVICES]]
+            if isinstance(user_input[CONF_DEVICES], str):
+                if user_input[CONF_DEVICES] == "":
+                    self.data[CONF_DEVICES] = []
+                else:
+                    self.data[CONF_DEVICES] = [user_input[CONF_DEVICES]]
             
             if user_input[CONF_ADD_ANOTHER_DEVICE]:
-                await self.async_step_add_device()
+                return await self.async_step_add_device()
             
             try:
                 await validate_auth(
@@ -79,7 +81,6 @@ class JciHitachiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_add_device(self, user_input=None):
-        _LOGGER.debug(f"ANOTHER DEVICE2 {user_input}") # FIXME: Fix the step not showing problem.
         errors = {}
         if user_input is not None:
             if user_input[CONF_DEVICES] != "":
@@ -87,8 +88,9 @@ class JciHitachiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if user_input[CONF_ADD_ANOTHER_DEVICE]:
                 return await self.async_step_add_device()
             else:
-                return
-        _LOGGER.debug(f"ANOTHER DEVICE3 {user_input}")
+                self.data[CONF_ADD_ANOTHER_DEVICE] = False
+                return await self.async_step_user(self.data)
+
         return self.async_show_form(
             step_id="add_device", data_schema=CONFIG_FLOW_ADD_DEVICE_SCHEMA, errors=errors
         )

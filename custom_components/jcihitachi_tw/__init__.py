@@ -6,7 +6,6 @@ from datetime import timedelta
 from queue import Queue
 from typing import NamedTuple
 
-from homeassistant.const import CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD
 from homeassistant.helpers import discovery
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -17,6 +16,9 @@ from homeassistant.helpers.update_coordinator import (
 from JciHitachi.api import JciHitachiAPI
 
 from .const import (
+    CONF_DEVICES,
+    CONF_EMAIL,
+    CONF_PASSWORD,
     CONF_RETRY,
     CONFIG_SCHEMA,
     DOMAIN,
@@ -33,7 +35,9 @@ DATA_UPDATE_INTERVAL = timedelta(seconds=30)
 
 
 async def async_setup(hass, config):
+    """Set up from the configuration.yaml"""
     if config.get(DOMAIN, None) is None:
+        # skip if no config defined in configuration.yaml"""
         return True
     _LOGGER.debug(
         {
@@ -112,6 +116,7 @@ async def async_setup(hass, config):
         _LOGGER.debug("Starting JciHitachi components.")
         for platform in PLATFORMS:
             discovery.load_platform(hass, platform, DOMAIN, {}, config)
+
     # Return boolean to indicate that initialization was successful.
     return True
 

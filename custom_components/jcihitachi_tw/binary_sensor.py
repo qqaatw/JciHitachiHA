@@ -92,4 +92,3 @@ class JciHitachiWaterFullBinarySensorEntity(JciHitachiEntity, BinarySensorEntity
     @property
     def unique_id(self):
         return f"{self._peripheral.gateway_mac_address}_water_full_binary_sensor"
-
