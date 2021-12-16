@@ -217,6 +217,10 @@ class JciHitachiEntity(CoordinatorEntity):
         self._peripheral = peripheral
 
     @property
+    def available(self) -> bool:
+        return self._peripheral.available
+
+    @property
     def device_info(self) -> dict:
         """Return device info of the entity."""
         return {
