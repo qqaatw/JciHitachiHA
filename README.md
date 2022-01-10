@@ -1,5 +1,8 @@
 # Jci-Hitachi Home Assistant Integration
 
+## **Warning: Do not update to the latest firmware as it would make this integration fail.**
+## **Warning: 請不要更新韌體否則Integration可能會失效**
+
 **Help wanted: I've been developing the heat exchanger support, but I've no such device to test its functionality. If you want to help with the development, please contact me via email: `qqaatw[a-t]gmail.com`. Thank you.**
 
 **Help wanted: 我目前正在開發支援全熱交換機，但是沒有裝置可以測試。若您願意協助此功能的開發，請透過email: `qqaatw[a-t]gmail.com` 聯繫我。Thank you.**

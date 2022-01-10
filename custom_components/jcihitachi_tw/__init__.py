@@ -42,7 +42,7 @@ async def async_setup(hass, config):
     _LOGGER.debug(
         {
             "CONF_EMAIL": config[DOMAIN].get(CONF_EMAIL),
-            "CONF_PASSWORD": ''.join(['*']*len(config[DOMAIN].get(CONF_PASSWORD))),
+            "CONF_PASSWORD": '*' * len(config[DOMAIN].get(CONF_PASSWORD)),
             "CONF_RETRY": config[DOMAIN].get(CONF_RETRY),
             "CONF_DEVICES": config[DOMAIN].get(CONF_DEVICES)
         }
@@ -127,7 +127,7 @@ async def async_setup_entry(hass, config_entry):
     _LOGGER.debug(
         {
             "CONF_EMAIL": config.get(CONF_EMAIL),
-            "CONF_PASSWORD": ''.join(['*']*len(config.get(CONF_PASSWORD))),
+            "CONF_PASSWORD": '*' * len(config.get(CONF_PASSWORD)),
             "CONF_RETRY": config.get(CONF_RETRY),
             "CONF_DEVICES": config.get(CONF_DEVICES)
         }
