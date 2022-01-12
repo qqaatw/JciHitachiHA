@@ -28,18 +28,18 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "AC":
+    for thing in api.things.values():
+        if thing.type == "AC":
             async_add_entities(
-                [JciHitachiOutdoorTempSensorEntity(peripheral, coordinator),
-                 JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
+                [JciHitachiOutdoorTempSensorEntity(thing, coordinator),
+                 JciHitachiPowerConsumptionSensorEntity(thing, coordinator)],
                 update_before_add=True)
-        elif peripheral.type == "DH":
+        elif thing.type == "DH":
             async_add_entities(
-                [JciHitachiIndoorHumiditySensorEntity(peripheral, coordinator),
-                 JciHitachiOdorLevelSensorEntity(peripheral, coordinator),
-                 JciHitachiPM25SensorEntity(peripheral, coordinator),
-                 JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
+                [JciHitachiIndoorHumiditySensorEntity(thing, coordinator),
+                 JciHitachiOdorLevelSensorEntity(thing, coordinator),
+                 JciHitachiPM25SensorEntity(thing, coordinator),
+                 JciHitachiPowerConsumptionSensorEntity(thing, coordinator)],
                 update_before_add=True)
 
 
@@ -49,33 +49,33 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "AC":
+    for thing in api.things.values():
+        if thing.type == "AC":
             async_add_devices(
-                [JciHitachiOutdoorTempSensorEntity(peripheral, coordinator),
-                 JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
+                [JciHitachiOutdoorTempSensorEntity(thing, coordinator),
+                 JciHitachiPowerConsumptionSensorEntity(thing, coordinator)],
                 update_before_add=True)
-        elif peripheral.type == "DH":
+        elif thing.type == "DH":
             async_add_devices(
-                [JciHitachiIndoorHumiditySensorEntity(peripheral, coordinator),
-                 JciHitachiOdorLevelSensorEntity(peripheral, coordinator),
-                 JciHitachiPM25SensorEntity(peripheral, coordinator),
-                 JciHitachiPowerConsumptionSensorEntity(peripheral, coordinator)],
+                [JciHitachiIndoorHumiditySensorEntity(thing, coordinator),
+                 JciHitachiOdorLevelSensorEntity(thing, coordinator),
+                 JciHitachiPM25SensorEntity(thing, coordinator),
+                 JciHitachiPowerConsumptionSensorEntity(thing, coordinator)],
                 update_before_add=True)
 
 class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
-    def __init__(self, peripheral, coordinator):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
 
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} Indoor Humidity"
+        return f"{self._thing.name} Indoor Humidity"
 
     @property
     def state(self):
         """Return the indoor humidity."""
-        status = self.hass.data[UPDATED_DATA].get(self._peripheral.name, None)
+        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.indoor_humidity
         return None
@@ -92,22 +92,22 @@ class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
 
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_indoor_humidity_sensor"
+        return f"{self._thing.gateway_mac_address}_indoor_humidity_sensor"
 
 
 class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
-    def __init__(self, peripheral, coordinator):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
 
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} PM2.5"
+        return f"{self._thing.name} PM2.5"
 
     @property
     def state(self):
         """Return the PM2.5 value."""
-        status = self.hass.data[UPDATED_DATA].get(self._peripheral.name, None)
+        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.pm25_value
         return None
@@ -124,22 +124,22 @@ class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
 
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_pm25_sensor"
+        return f"{self._thing.gateway_mac_address}_pm25_sensor"
 
 
 class JciHitachiOdorLevelSensorEntity(JciHitachiEntity, SensorEntity):
-    def __init__(self, peripheral, coordinator):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
 
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} Odor Level"
+        return f"{self._thing.name} Odor Level"
 
     @property
     def state(self):
         """Return the odor level."""
-        status = self.hass.data[UPDATED_DATA].get(self._peripheral.name, None)
+        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.odor_level == "low":
                 return ODOR_LEVEL_LOW
@@ -151,22 +151,22 @@ class JciHitachiOdorLevelSensorEntity(JciHitachiEntity, SensorEntity):
 
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_odor_level_sensor"
+        return f"{self._thing.gateway_mac_address}_odor_level_sensor"
 
 
 class JciHitachiOutdoorTempSensorEntity(JciHitachiEntity, SensorEntity):
-    def __init__(self, peripheral, coordinator):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
     
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} Outdoor Temperature"
+        return f"{self._thing.name} Outdoor Temperature"
 
     @property
     def state(self):
         """Return the outdoor temperature."""
-        status = self.hass.data[UPDATED_DATA].get(self._peripheral.name, None)
+        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.outdoor_temp
         return None
@@ -183,22 +183,22 @@ class JciHitachiOutdoorTempSensorEntity(JciHitachiEntity, SensorEntity):
     
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_outdoor_temp_sensor"
+        return f"{self._thing.gateway_mac_address}_outdoor_temp_sensor"
 
 
 class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
-    def __init__(self, peripheral, coordinator):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
 
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} Power Consumption"
+        return f"{self._thing.name} Power Consumption"
 
     @property
     def state(self):
         """Return the power consumption in KW/H"""
-        status = self.hass.data[UPDATED_DATA].get(self._peripheral.name, None)
+        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.power_kwh
         return None
@@ -215,7 +215,7 @@ class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
 
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_power_consumption_sensor"
+        return f"{self._thing.gateway_mac_address}_power_consumption_sensor"
 
     @property
     def state_class(self):

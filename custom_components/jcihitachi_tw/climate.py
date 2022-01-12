@@ -66,13 +66,13 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "AC":
-            status = hass.data[UPDATED_DATA][peripheral.name]
+    for thing in api.things.values():
+        if thing.type == "AC":
+            status = hass.data[UPDATED_DATA][thing.name]
             supported_features = JciHitachiClimateEntity.calculate_supported_features(status)
             async_add_entities(
                 [JciHitachiClimateEntity(
-                    peripheral, coordinator, supported_features)],
+                    thing, coordinator, supported_features)],
                 update_before_add=True
             )
 
@@ -83,21 +83,21 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "AC":
-            status = hass.data[UPDATED_DATA][peripheral.name]
+    for thing in api.things.values():
+        if thing.type == "AC":
+            status = hass.data[UPDATED_DATA][thing.name]
             supported_features = JciHitachiClimateEntity.calculate_supported_features(
                 status)
             async_add_devices(
                 [JciHitachiClimateEntity(
-                    peripheral, coordinator, supported_features)],
+                    thing, coordinator, supported_features)],
                 update_before_add=True
             )
 
 
 class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
-    def __init__(self, peripheral, coordinator, supported_features):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator, supported_features):
+        super().__init__(thing, coordinator)
         self._supported_features = supported_features
 
     @property
@@ -113,7 +113,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             return status.indoor_temp
         return None
@@ -121,7 +121,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     @property
     def target_temperature(self):
         """Return the target temperature."""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             return status.target_temp
         return None
@@ -134,18 +134,18 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     @property
     def max_temp(self):
         """Return the maximum temperature."""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         return status.max_temp
     
     @property
     def min_temp(self):
         """Return the minimum temperature."""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         return status.min_temp
 
     @property
     def hvac_mode(self):
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             if status.power == "off":
                 return HVAC_MODE_OFF
@@ -169,7 +169,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     
     @property
     def preset_mode(self):
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             if status.energy_save == "enabled" and status.mold_prev == "enabled":
                 return PRESET_ECO_MOLD_PREVENTION
@@ -190,7 +190,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
     @property
     def fan_mode(self):
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             if status.air_speed == "auto":
                 return FAN_AUTO
@@ -211,7 +211,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     
     @property
     def swing_mode(self):
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             if status.vertical_wind_swingable == "enabled" and \
                 status.horizontal_wind_direction == "auto":
@@ -231,7 +231,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_climate"
+        return f"{self._thing.gateway_mac_address}_climate"
 
     @staticmethod
     def calculate_supported_features(status):
@@ -244,7 +244,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     def turn_on(self):
         """Turn the device on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("power", 1, self._peripheral.name)
+        self.put_queue("power", 1, self._thing.name)
         self.update()
         
     def set_hvac_mode(self, hvac_mode):
@@ -252,22 +252,22 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
         _LOGGER.debug(f"Set {self.name} hvac_mode to {hvac_mode}")
 
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status.power == "off" and hvac_mode != HVAC_MODE_OFF:
-            self.put_queue("power", 1, self._peripheral.name)
+            self.put_queue("power", 1, self._thing.name)
 
         if hvac_mode == HVAC_MODE_OFF:
-            self.put_queue("power", 0, self._peripheral.name)
+            self.put_queue("power", 0, self._thing.name)
         elif hvac_mode == HVAC_MODE_COOL:
-            self.put_queue("mode", 0, self._peripheral.name)
+            self.put_queue("mode", 0, self._thing.name)
         elif hvac_mode == HVAC_MODE_DRY:
-            self.put_queue("mode", 1, self._peripheral.name)
+            self.put_queue("mode", 1, self._thing.name)
         elif hvac_mode == HVAC_MODE_FAN_ONLY:
-            self.put_queue("mode", 2, self._peripheral.name)
+            self.put_queue("mode", 2, self._thing.name)
         elif hvac_mode == HVAC_MODE_AUTO:
-            self.put_queue("mode", 3, self._peripheral.name)
+            self.put_queue("mode", 3, self._thing.name)
         elif hvac_mode == HVAC_MODE_HEAT:
-            self.put_queue("mode", 4, self._peripheral.name)
+            self.put_queue("mode", 4, self._thing.name)
         else:
             _LOGGER.error("Invalid hvac_mode.")
         self.update()
@@ -278,25 +278,25 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         _LOGGER.debug(f"Set {self.name} preset_mode to {preset_mode}")
         
         if preset_mode == PRESET_ECO_MOLD_PREVENTION:
-            self.put_queue("energy_save", 1, self._peripheral.name)
-            self.put_queue("mold_prev", 1, self._peripheral.name)
-            self.put_queue("fast_op", 0, self._peripheral.name)
+            self.put_queue("energy_save", 1, self._thing.name)
+            self.put_queue("mold_prev", 1, self._thing.name)
+            self.put_queue("fast_op", 0, self._thing.name)
         elif preset_mode == PRESET_ECO:
-            self.put_queue("energy_save", 1, self._peripheral.name)
-            self.put_queue("mold_prev", 0, self._peripheral.name)
-            self.put_queue("fast_op", 0, self._peripheral.name)
+            self.put_queue("energy_save", 1, self._thing.name)
+            self.put_queue("mold_prev", 0, self._thing.name)
+            self.put_queue("fast_op", 0, self._thing.name)
         elif preset_mode == PRESET_MOLD_PREVENTION:
-            self.put_queue("energy_save", 0, self._peripheral.name)
-            self.put_queue("mold_prev", 1, self._peripheral.name)
-            self.put_queue("fast_op", 0, self._peripheral.name)
+            self.put_queue("energy_save", 0, self._thing.name)
+            self.put_queue("mold_prev", 1, self._thing.name)
+            self.put_queue("fast_op", 0, self._thing.name)
         elif preset_mode == PRESET_BOOST:
-            self.put_queue("energy_save", 0, self._peripheral.name)
-            self.put_queue("mold_prev", 0, self._peripheral.name)
-            self.put_queue("fast_op", 1, self._peripheral.name)
+            self.put_queue("energy_save", 0, self._thing.name)
+            self.put_queue("mold_prev", 0, self._thing.name)
+            self.put_queue("fast_op", 1, self._thing.name)
         elif preset_mode == PRESET_NONE:
-            self.put_queue("energy_save", 0, self._peripheral.name)
-            self.put_queue("mold_prev", 0, self._peripheral.name)
-            self.put_queue("fast_op", 0, self._peripheral.name)
+            self.put_queue("energy_save", 0, self._thing.name)
+            self.put_queue("mold_prev", 0, self._thing.name)
+            self.put_queue("fast_op", 0, self._thing.name)
         else:
             _LOGGER.error("Invalid preset_mode.")
         self.update()
@@ -307,13 +307,13 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         _LOGGER.debug(f"Set {self.name} fan_mode to {fan_mode}")
 
         if fan_mode == FAN_AUTO:
-            self.put_queue("air_speed", 0, self._peripheral.name)
+            self.put_queue("air_speed", 0, self._thing.name)
         elif fan_mode == FAN_LOW:
-            self.put_queue("air_speed", 1, self._peripheral.name)
+            self.put_queue("air_speed", 1, self._thing.name)
         elif fan_mode == FAN_MEDIUM:
-            self.put_queue("air_speed", 3, self._peripheral.name)
+            self.put_queue("air_speed", 3, self._thing.name)
         elif fan_mode == FAN_HIGH:
-            self.put_queue("air_speed", 4, self._peripheral.name)
+            self.put_queue("air_speed", 4, self._thing.name)
         else:
             _LOGGER.error("Invalid fan_mode.")
         self.update()
@@ -324,17 +324,17 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         _LOGGER.debug(f"Set {self.name} swing_mode to {swing_mode}")
 
         if swing_mode == SWING_OFF:
-            self.put_queue("vertical_wind_swingable", 0, self._peripheral.name)
-            self.put_queue("horizontal_wind_direction", 3, self._peripheral.name)
+            self.put_queue("vertical_wind_swingable", 0, self._thing.name)
+            self.put_queue("horizontal_wind_direction", 3, self._thing.name)
         elif swing_mode == SWING_VERTICAL:
-            self.put_queue("vertical_wind_swingable", 1, self._peripheral.name)
-            self.put_queue("horizontal_wind_direction", 3, self._peripheral.name)
+            self.put_queue("vertical_wind_swingable", 1, self._thing.name)
+            self.put_queue("horizontal_wind_direction", 3, self._thing.name)
         elif swing_mode == SWING_HORIZONTAL:
-            self.put_queue("vertical_wind_swingable", 0, self._peripheral.name)
-            self.put_queue("horizontal_wind_direction", 0, self._peripheral.name)
+            self.put_queue("vertical_wind_swingable", 0, self._thing.name)
+            self.put_queue("horizontal_wind_direction", 0, self._thing.name)
         elif swing_mode == SWING_BOTH:
-            self.put_queue("vertical_wind_swingable", 1, self._peripheral.name)
-            self.put_queue("horizontal_wind_direction", 0, self._peripheral.name)
+            self.put_queue("vertical_wind_swingable", 1, self._thing.name)
+            self.put_queue("horizontal_wind_direction", 0, self._thing.name)
         else:
             _LOGGER.error("Invalid swing_mode.")
         self.update()
@@ -351,5 +351,5 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         # Limit the target temperature into acceptable range.
         target_temp = min(self.max_temp, target_temp)
         target_temp = max(self.min_temp, target_temp)
-        self.put_queue("target_temp", target_temp, self._peripheral.name)
+        self.put_queue("target_temp", target_temp, self._thing.name)
         self.update()

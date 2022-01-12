@@ -13,7 +13,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed
 )
 
-from JciHitachi.api import JciHitachiAPI
+from JciHitachi.api import JciHitachiAWSAPI
 
 from .const import (
     CONF_DEVICES,
@@ -51,7 +51,7 @@ async def async_setup(hass, config):
     if config[DOMAIN].get(CONF_DEVICES) == []:
         config[DOMAIN][CONF_DEVICES] = None
 
-    api = JciHitachiAPI(
+    api = JciHitachiAWSAPI(
         email=config[DOMAIN].get(CONF_EMAIL),
         password=config[DOMAIN].get(CONF_PASSWORD),
         device_names=config[DOMAIN].get(CONF_DEVICES),
@@ -73,7 +73,7 @@ async def async_setup(hass, config):
         return False
 
     _LOGGER.debug(
-        f"Peripheral info: {[peripheral for peripheral in api.peripherals.values()]}")
+        f"Thing info: {[thing for thing in api.things.values()]}")
     
     async def async_update_data():
         """Fetch data from API endpoint.
@@ -86,7 +86,7 @@ async def async_setup(hass, config):
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
                 await hass.async_add_executor_job(api.refresh_status)
-                hass.data[UPDATED_DATA] = api.get_status()
+                hass.data[UPDATED_DATA] = api.get_status(legacy=True)
 
         except asyncio.TimeoutError as err:
             raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
@@ -95,7 +95,7 @@ async def async_setup(hass, config):
             raise UpdateFailed(f"Error communicating with API: {err}")
         
         _LOGGER.debug(
-            f"Latest data: {[(name, value.status) for name, value in hass.data[UPDATED_DATA].items()]}")
+            f"Latest data: {[(name, value.legacy_status) for name, value in hass.data[UPDATED_DATA].items()]}")
 
     coordinator = DataUpdateCoordinator(
         hass,
@@ -136,7 +136,7 @@ async def async_setup_entry(hass, config_entry):
     if config.get(CONF_DEVICES) == []:
         config[CONF_DEVICES] = None
 
-    api = JciHitachiAPI(
+    api = JciHitachiAWSAPI(
         email=config.get(CONF_EMAIL),
         password=config.get(CONF_PASSWORD),
         device_names=config.get(CONF_DEVICES),
@@ -158,7 +158,7 @@ async def async_setup_entry(hass, config_entry):
         return False
 
     _LOGGER.debug(
-        f"Peripheral info: {[peripheral for peripheral in api.peripherals.values()]}")
+        f"Thing info: {[thing for thing in api.things.values()]}")
     
     async def _async_update_data():
         """Fetch data from API endpoint.
@@ -171,7 +171,7 @@ async def async_setup_entry(hass, config_entry):
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
                 await hass.async_add_executor_job(api.refresh_status)
-                hass.data[UPDATED_DATA] = api.get_status()
+                hass.data[UPDATED_DATA] = api.get_status(legacy=True)
 
         except asyncio.TimeoutError as err:
             raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
@@ -212,32 +212,32 @@ async def async_setup_entry(hass, config_entry):
 
 
 class JciHitachiEntity(CoordinatorEntity):
-    def __init__(self, peripheral, coordinator):
+    def __init__(self, thing, coordinator):
         super().__init__(coordinator)
-        self._peripheral = peripheral
+        self._thing = thing
 
     @property
     def available(self) -> bool:
-        return self._peripheral.available
+        return self._thing.available
 
     @property
     def device_info(self) -> dict:
         """Return device info of the entity."""
         return {
-            "identifiers": {(DOMAIN, self._peripheral.gateway_mac_address)},
-            "name": self._peripheral.name,
-            "manufacturer": self._peripheral.brand,
-            "model": self._peripheral.model,
+            "identifiers": {(DOMAIN, self._thing.gateway_mac_address)},
+            "name": self._thing.name,
+            "manufacturer": self._thing.brand,
+            "model": self._thing.model,
         }
 
     @property
     def name(self):
-        """Return the peripheral's name."""
-        return self._peripheral.name
+        """Return the thing's name."""
+        return self._thing.name
 
     @property
     def unique_id(self):
-        """Return the peripheral's unique id."""
+        """Return the thing's unique id."""
         raise NotImplementedError
     
     def put_queue(self, command, value, device_name):
@@ -256,9 +256,11 @@ class JciHitachiEntity(CoordinatorEntity):
             result = api.set_status(*data)
             if result is True:
                 _LOGGER.debug("Data updated successfully.")
+            else:
+                _LOGGER.error("Failed to update data.")
 
         api.refresh_status()
-        self.hass.data[UPDATED_DATA] = api.get_status()
+        self.hass.data[UPDATED_DATA] = api.get_status(legacy=True)
         _LOGGER.debug(
             f"Latest data: {[(name, value.status) for name, value in self.hass.data[UPDATED_DATA].items()]}"
         )

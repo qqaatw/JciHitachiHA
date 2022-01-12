@@ -14,11 +14,11 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "DH":
+    for thing in api.things.values():
+        if thing.type == "DH":
             async_add_entities(
-                [JciHitachiErrorBinarySensorEntity(peripheral, coordinator),
-                 JciHitachiWaterFullBinarySensorEntity(peripheral, coordinator)],
+                [JciHitachiErrorBinarySensorEntity(thing, coordinator),
+                 JciHitachiWaterFullBinarySensorEntity(thing, coordinator)],
                 update_before_add=True)
 
 
@@ -28,27 +28,27 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "DH":
+    for thing in api.things.values():
+        if thing.type == "DH":
             async_add_devices(
-                [JciHitachiErrorBinarySensorEntity(peripheral, coordinator),
-                 JciHitachiWaterFullBinarySensorEntity(peripheral, coordinator)],
+                [JciHitachiErrorBinarySensorEntity(thing, coordinator),
+                 JciHitachiWaterFullBinarySensorEntity(thing, coordinator)],
                 update_before_add=True)
 
 
 class JciHitachiErrorBinarySensorEntity(JciHitachiEntity, BinarySensorEntity):
-    def __init__(self, peripheral, coordinator):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
 
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} Error"
+        return f"{self._thing.name} Error"
 
     @property
     def is_on(self):
         """Indicate whether an error occurred."""
-        status = self.hass.data[UPDATED_DATA].get(self._peripheral.name, None)
+        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.error_code == 0:
                 return False
@@ -62,22 +62,22 @@ class JciHitachiErrorBinarySensorEntity(JciHitachiEntity, BinarySensorEntity):
 
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_error_binary_sensor"
+        return f"{self._thing.gateway_mac_address}_error_binary_sensor"
 
 
 class JciHitachiWaterFullBinarySensorEntity(JciHitachiEntity, BinarySensorEntity):
-    def __init__(self, peripheral, coordinator):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
 
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} Water Full Warning"
+        return f"{self._thing.name} Water Full Warning"
 
     @property
     def is_on(self):
         """Indicate whether the water tank is full."""
-        status = self.hass.data[UPDATED_DATA].get(self._peripheral.name, None)
+        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.water_full_warning == "off":
                 return False
@@ -91,4 +91,4 @@ class JciHitachiWaterFullBinarySensorEntity(JciHitachiEntity, BinarySensorEntity
     
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_water_full_binary_sensor"
+        return f"{self._thing.gateway_mac_address}_water_full_binary_sensor"

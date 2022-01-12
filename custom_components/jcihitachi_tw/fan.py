@@ -17,15 +17,15 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "DH":
-            status = hass.data[UPDATED_DATA][peripheral.name]
+    for thing in api.things.values():
+        if thing.type == "DH":
+            status = hass.data[UPDATED_DATA][thing.name]
             supported_features = JciHitachiDehumidifierFanEntity.calculate_supported_features(
                 status
             )
             async_add_entities(
                 [JciHitachiDehumidifierFanEntity(
-                    peripheral, coordinator, supported_features)],
+                    thing, coordinator, supported_features)],
                 update_before_add=True)
 
 
@@ -35,27 +35,27 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "DH":
-            status = hass.data[UPDATED_DATA][peripheral.name]
+    for thing in api.things.values():
+        if thing.type == "DH":
+            status = hass.data[UPDATED_DATA][thing.name]
             supported_features = JciHitachiDehumidifierFanEntity.calculate_supported_features(
                 status
             )
             async_add_devices(
                 [JciHitachiDehumidifierFanEntity(
-                    peripheral, coordinator, supported_features)],
+                    thing, coordinator, supported_features)],
                 update_before_add=True)
 
 
 class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
-    def __init__(self, peripheral, coordinator, supported_features):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator, supported_features):
+        super().__init__(thing, coordinator)
         self._supported_features = supported_features
 
     @property
     def name(self):
         """Return the name of the entity."""
-        return f"{self._peripheral.name} Air Speed"
+        return f"{self._thing.name} Air Speed"
 
     @property
     def supported_features(self):
@@ -65,7 +65,7 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     @property
     def is_on(self):
         """Return true if the entity is on"""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             if status.power == "off":
                 return False
@@ -78,7 +78,7 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     @property
     def percentage(self):
         """Return the current speed percentage."""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         return ordered_list_item_to_percentage(ORDERED_NAMED_FAN_SPEEDS, status.air_speed)
     
     @property
@@ -88,7 +88,7 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
 
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_dehumidifier_air_speed"
+        return f"{self._thing.gateway_mac_address}_dehumidifier_air_speed"
 
     @staticmethod
     def calculate_supported_features(status):
@@ -103,13 +103,13 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
         _LOGGER.debug(f"Set {self.name} air speed to {air_speed}")
 
         if air_speed == "silent":
-            self.put_queue("air_speed", 1, self._peripheral.name)
+            self.put_queue("air_speed", 1, self._thing.name)
         elif air_speed == "low":
-            self.put_queue("air_speed", 2, self._peripheral.name)
+            self.put_queue("air_speed", 2, self._thing.name)
         elif air_speed == "moderate":
-            self.put_queue("air_speed", 3, self._peripheral.name)
+            self.put_queue("air_speed", 3, self._thing.name)
         elif air_speed == "high":
-            self.put_queue("air_speed", 4, self._peripheral.name)
+            self.put_queue("air_speed", 4, self._thing.name)
         else:
             _LOGGER.error("Invalid air_speed.")
         self.update()
@@ -117,11 +117,11 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     def turn_on(self, **kwargs):
         """Turn the device on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("power", 1, self._peripheral.name)
+        self.put_queue("power", 1, self._thing.name)
         self.update()
 
     def turn_off(self, **kwargs):
         """Turn the device off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("power", 0, self._peripheral.name)
+        self.put_queue("power", 0, self._thing.name)
         self.update()

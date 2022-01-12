@@ -38,15 +38,15 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "DH":
-            status = hass.data[UPDATED_DATA][peripheral.name]
+    for thing in api.things.values():
+        if thing.type == "DH":
+            status = hass.data[UPDATED_DATA][thing.name]
             supported_features = JciHitachiDehumidifierEntity.calculate_supported_features(
                 status
             )
             async_add_entities(
                 [JciHitachiDehumidifierEntity(
-                    peripheral, coordinator, supported_features)],
+                    thing, coordinator, supported_features)],
                 update_before_add=True
             )
 
@@ -57,22 +57,22 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
 
-    for peripheral in api.peripherals.values():
-        if peripheral.type == "DH":
-            status = hass.data[UPDATED_DATA][peripheral.name]
+    for thing in api.things.values():
+        if thing.type == "DH":
+            status = hass.data[UPDATED_DATA][thing.name]
             supported_features = JciHitachiDehumidifierEntity.calculate_supported_features(
                 status
             )
             async_add_devices(
                 [JciHitachiDehumidifierEntity(
-                    peripheral, coordinator, supported_features)],
+                    thing, coordinator, supported_features)],
                 update_before_add=True
             )
 
 
 class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
-    def __init__(self, peripheral, coordinator, supported_features):
-        super().__init__(peripheral, coordinator)
+    def __init__(self, thing, coordinator, supported_features):
+        super().__init__(thing, coordinator)
         self._supported_features = supported_features
     
     @property
@@ -83,7 +83,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     @property
     def target_humidity(self):
         """Return the current temperature."""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             return status.target_humidity
         return None
@@ -91,18 +91,18 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     @property
     def max_humidity(self):
         """Return the maximum humidity."""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         return status.max_humidity
     
     @property
     def min_humidity(self):
         """Return the minimum humidity."""
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         return status.min_humidity
     
     @property
     def mode(self):
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             if status.mode == "auto":
                 return MODE_AUTO
@@ -130,7 +130,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
 
     @property
     def is_on(self):
-        status = self.hass.data[UPDATED_DATA][self._peripheral.name]
+        status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status:
             if status.power == "off":
                 return False
@@ -146,7 +146,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     
     @property
     def unique_id(self):
-        return f"{self._peripheral.gateway_mac_address}_dehumidifier"
+        return f"{self._thing.gateway_mac_address}_dehumidifier"
 
     @staticmethod
     def calculate_supported_features(status):
@@ -159,21 +159,21 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         _LOGGER.debug(f"Set {self.name} mode to {mode}")
 
         if mode == MODE_AUTO:
-            self.put_queue("mode", 0, self._peripheral.name)
+            self.put_queue("mode", 0, self._thing.name)
         elif mode == MODE_CUSTOM:
-            self.put_queue("mode", 1, self._peripheral.name)
+            self.put_queue("mode", 1, self._thing.name)
         elif mode == MODE_CONTINUOUS:
-            self.put_queue("mode", 2, self._peripheral.name)
+            self.put_queue("mode", 2, self._thing.name)
         elif mode == MODE_CLOTHES_DRY:
-            self.put_queue("mode", 3, self._peripheral.name)
+            self.put_queue("mode", 3, self._thing.name)
         elif mode == MODE_AIR_PURIFY:
-            self.put_queue("mode", 4, self._peripheral.name)
+            self.put_queue("mode", 4, self._thing.name)
         elif mode == MODE_MOLD_PREV:
-            self.put_queue("mode", 5, self._peripheral.name)
+            self.put_queue("mode", 5, self._thing.name)
         elif mode == MODE_LOW_HUMIDITY:
-            self.put_queue("mode", 8, self._peripheral.name)
+            self.put_queue("mode", 8, self._thing.name)
         elif mode == MODE_ECO_COMFORT:
-            self.put_queue("mode", 9, self._peripheral.name)
+            self.put_queue("mode", 9, self._thing.name)
         else:
             _LOGGER.error("Invalid mode.")
         self.update()
@@ -184,19 +184,19 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         target_humidity = int(humidity)
         _LOGGER.debug(f"Set {self.name} humidity to {target_humidity}")
 
-        self.put_queue("target_humidity", target_humidity, self._peripheral.name)
+        self.put_queue("target_humidity", target_humidity, self._thing.name)
         self.update()
     
     def turn_on(self, **kwargs):
         """Turn the device on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("power", 1, self._peripheral.name)
+        self.put_queue("power", 1, self._thing.name)
         self.update()
     
     def turn_off(self, **kwargs):
         """Turn the device off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("power", 0, self._peripheral.name)
+        self.put_queue("power", 0, self._thing.name)
         self.update()
 
     
