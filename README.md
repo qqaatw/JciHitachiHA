@@ -1,8 +1,5 @@
 # Jci-Hitachi Home Assistant Integration
 
-## **Warning: Do not update to the latest firmware as it would make this integration fail.**
-## **Warning: 請不要更新韌體否則Integration可能會失效**
-
 **Help wanted: I've been developing the heat exchanger support, but I've no such device to test its functionality. If you want to help with the development, please contact me via email: `qqaatw[a-t]gmail.com`. Thank you.**
 
 **Help wanted: 我目前正在開發支援全熱交換機，但是沒有裝置可以測試。若您願意協助此功能的開發，請透過email: `qqaatw[a-t]gmail.com` 聯繫我。Thank you.**
@@ -41,7 +38,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Horizontal wind direction 導風板水平方向 (Untested)
   - Target temperature 目標溫度
   - Indoor temperature 室內溫度
-  - Outdoor temperature 室外溫度
+  - Outdoor temperature 室外溫度 (No longer supported after v0.2)
   - Mold prevention 機體防霉
   - Energy saving 節電
   - Fast operation 快速運轉
@@ -84,7 +81,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 ## Known issues
 
-  Currently none.
+1. The server is currently quite unstable so the timed out errors may occur. If you see these kinds of errors when adding integration or initializing HA Core, please keep reinstalling the integration or restarting HA Core until the status of your devices are displayed normally.
 
 ## License
 
