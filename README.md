@@ -74,10 +74,12 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 - RAS-36NJF / RAC-36NK
 - RAS-36NK  / RAC-36NK1
 - RAS-28NJF / RAC-28NK
+- RA-36NV1
 
 ### Dehumidifier
 
 - RD-360HH
+- RD-240HH
 
 ## Known issues
 
