@@ -80,10 +80,11 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 - RD-360HH
 - RD-240HH
+- RD-200HH
 
 ## Known issues
 
-1. The server is currently quite unstable so the timed out errors may occur. If you see these kinds of errors when adding integration or initializing HA Core, please keep reinstalling the integration or restarting HA Core until the status of your devices are displayed normally.
+1. Clean filter notification of the dehumidifier doesn't work now.
 
 ## License
 
