@@ -9,7 +9,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up the button platform."""
+    """Set up the number platform."""
     
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]
@@ -24,7 +24,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
-    """Set up the button platform from a config entry."""
+    """Set up the number platform from a config entry."""
 
     api = hass.data[API]
     coordinator = hass.data[COORDINATOR]

@@ -38,11 +38,11 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Horizontal wind direction 導風板水平方向 (Untested)
   - Target temperature 目標溫度
   - Indoor temperature 室內溫度
-  - Outdoor temperature 室外溫度 (No longer supported after v0.2)
   - Mold prevention 機體防霉
   - Energy saving 節電
   - Fast operation 快速運轉
   - Power consumption 用電統計 (supports HA core v2021.9.0+)
+  - Monthly power consumption 月用電統計
   - ~~Sleep timer 睡眠計時器~~ (Only supported by LibJciHitachi)
 - Hitachi Dehumidifier 日立除濕機
   - Power 電源
@@ -59,6 +59,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Odor level 異味等級
   - Air cleaning filter setting 空氣清淨濾網設定
   - Power consumption 用電統計 (supports HA core v2021.9.0+)
+  - Monthly power consumption 月用電統計
   - ~~Sound control 聲音控制~~ (Only supported by LibJciHitachi)
   - ~~Display brightness 顯示器亮度~~ (Only supported by LibJciHitachi)
   - ~~Side vent 側吹~~ (Only supported by LibJciHitachi)
@@ -74,6 +75,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 - RAS-36NJF / RAC-36NK
 - RAS-36NK  / RAC-36NK1
 - RAS-28NJF / RAC-28NK
+- RAS-28NB / RAC-28NB
 - RA-36NV1
 
 ### Dehumidifier
