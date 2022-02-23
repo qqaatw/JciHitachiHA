@@ -255,12 +255,13 @@ class JciHitachiEntity(CoordinatorEntity):
             _LOGGER.debug(f"Updating data: {data}")
             result = api.set_status(*data)
             if result is True:
-                _LOGGER.debug("Data updated successfully.")
+                _LOGGER.debug(f"Data: {data} updated successfully.")
             else:
                 _LOGGER.error("Failed to update data.")
 
-        api.refresh_status()
+        # Here we don't need to refresh status as it was refreshed by `api.set_status`.
         self.hass.data[UPDATED_DATA] = api.get_status(legacy=True)
+        
         _LOGGER.debug(
             f"Latest data: {[(name, value.status) for name, value in self.hass.data[UPDATED_DATA].items()]}"
         )
