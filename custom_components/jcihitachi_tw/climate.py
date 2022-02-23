@@ -319,7 +319,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         self.update()
 
     def set_swing_mode(self, swing_mode):
-        """Set swing mode."""
+        """Set new swing mode."""
 
         _LOGGER.debug(f"Set {self.name} swing_mode to {swing_mode}")
 

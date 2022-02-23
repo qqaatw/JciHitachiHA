@@ -24,13 +24,14 @@ from .const import (
     DOMAIN,
     API,
     COORDINATOR,
+    MONTHLY_DATA,
     UPDATE_DATA,
     UPDATED_DATA,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "sensor", "switch"]
+PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "number", "sensor", "switch"]
 DATA_UPDATE_INTERVAL = timedelta(seconds=30)
 
 
@@ -59,6 +60,7 @@ async def async_setup(hass, config):
     )
 
     hass.data[API] = api
+    hass.data[MONTHLY_DATA] = list()
     hass.data[UPDATE_DATA] = Queue()
     hass.data[UPDATED_DATA] = dict()
     hass.data[COORDINATOR] = None
@@ -144,6 +146,7 @@ async def async_setup_entry(hass, config_entry):
     )
 
     hass.data[API] = api
+    hass.data[MONTHLY_DATA] = list()
     hass.data[UPDATE_DATA] = Queue()
     hass.data[UPDATED_DATA] = dict()
     hass.data[COORDINATOR] = None
