@@ -97,7 +97,7 @@ async def async_setup(hass, config):
             raise UpdateFailed(f"Error communicating with API: {err}")
         
         _LOGGER.debug(
-            f"Latest data: {[(name, value.legacy_status) for name, value in hass.data[UPDATED_DATA].items()]}")
+            f"Latest data: {[(name, value.status) for name, value in hass.data[UPDATED_DATA].items()]}")
 
     coordinator = DataUpdateCoordinator(
         hass,
