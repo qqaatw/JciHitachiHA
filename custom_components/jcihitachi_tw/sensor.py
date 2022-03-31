@@ -1,17 +1,14 @@
 """JciHitachi integration."""
-import logging
 import datetime
+import logging
 
-from homeassistant.components.sensor import SensorEntity, STATE_CLASS_TOTAL_INCREASING, STATE_CLASS_MEASUREMENT
-from homeassistant.const import (
-    DEVICE_CLASS_ENERGY,
-    DEVICE_CLASS_HUMIDITY,
-    DEVICE_CLASS_PM25,
-    DEVICE_CLASS_DATE,
-    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-    ENERGY_KILO_WATT_HOUR,
-    PERCENTAGE,
-)
+from homeassistant.components.sensor import (STATE_CLASS_MEASUREMENT,
+                                             STATE_CLASS_TOTAL_INCREASING,
+                                             SensorEntity)
+from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                                 DEVICE_CLASS_DATE, DEVICE_CLASS_ENERGY,
+                                 DEVICE_CLASS_HUMIDITY, DEVICE_CLASS_PM25,
+                                 ENERGY_KILO_WATT_HOUR, PERCENTAGE)
 
 from . import API, COORDINATOR, MONTHLY_DATA, UPDATED_DATA, JciHitachiEntity
 

@@ -3,16 +3,10 @@ import logging
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD
-
 from JciHitachi.api import JciHitachiAPI
 
-from .const import (
-    CONFIG_FLOW_SCHEMA,
-    CONFIG_FLOW_ADD_DEVICE_SCHEMA,
-    CONF_RETRY,
-    CONF_ADD_ANOTHER_DEVICE,
-    DOMAIN,
-)
+from .const import (CONF_ADD_ANOTHER_DEVICE, CONF_RETRY,
+                    CONFIG_FLOW_ADD_DEVICE_SCHEMA, CONFIG_FLOW_SCHEMA, DOMAIN)
 
 _LOGGER = logging.getLogger(__name__)
 

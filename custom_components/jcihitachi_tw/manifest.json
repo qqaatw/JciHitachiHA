@@ -5,7 +5,7 @@
   "version": "0.2.6",
   "documentation": "https://github.com/qqaatw/JciHitachiHA",
   "issue_tracker": "https://github.com/qqaatw/JciHitachiHA/issues",
-  "requirements": ["LibJciHitachi==0.4.7"],
+  "requirements": [],
   "codeowners": ["@qqaatw"],
   "iot_class": "cloud_polling"
 }

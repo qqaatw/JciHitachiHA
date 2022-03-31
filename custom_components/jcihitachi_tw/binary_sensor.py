@@ -1,7 +1,8 @@
 """JciHitachi integration."""
 import logging
 
-from homeassistant.components.binary_sensor import BinarySensorEntity, DEVICE_CLASS_PROBLEM
+from homeassistant.components.binary_sensor import (DEVICE_CLASS_PROBLEM,
+                                                    BinarySensorEntity)
 
 from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
 

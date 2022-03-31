@@ -1,39 +1,35 @@
 """JciHitachi integration."""
 import asyncio
-import async_timeout
 import logging
+from dataclasses import dataclass, field
 from datetime import timedelta
 from queue import Queue
-from typing import NamedTuple
+from typing import Optional
 
+import async_timeout
 from homeassistant.helpers import discovery
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-    UpdateFailed
-)
+from homeassistant.helpers.update_coordinator import (CoordinatorEntity,
+                                                      DataUpdateCoordinator,
+                                                      UpdateFailed)
+from homeassistant.requirements import RequirementsNotFound
+from homeassistant.util.package import install_package, is_installed
+
+from .const import (API, CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD, CONF_RETRY,
+                    CONFIG_SCHEMA, COORDINATOR, DOMAIN, MONTHLY_DATA,
+                    UPDATE_DATA, UPDATED_DATA)
+
+custom_required_packages = ["LibJciHitachi==0.4.7"]
+
+for pkg in custom_required_packages:
+    if not is_installed(pkg) and install_package(pkg, find_links="https://qqaatw.github.io/aws-crt-python-musllinux/"):
+        raise RequirementsNotFound(DOMAIN, [pkg])
 
 from JciHitachi.api import JciHitachiAWSAPI
 
-from .const import (
-    CONF_DEVICES,
-    CONF_EMAIL,
-    CONF_PASSWORD,
-    CONF_RETRY,
-    CONFIG_SCHEMA,
-    DOMAIN,
-    API,
-    COORDINATOR,
-    MONTHLY_DATA,
-    UPDATE_DATA,
-    UPDATED_DATA,
-)
-
 _LOGGER = logging.getLogger(__name__)
-
 PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "number", "sensor", "switch"]
 DATA_UPDATE_INTERVAL = timedelta(seconds=30)
-
+BASE_TIMEOUT = 5
 
 async def async_setup(hass, config):
     """Set up from the configuration.yaml"""
@@ -86,7 +82,7 @@ async def async_setup(hass, config):
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
-            async with async_timeout.timeout(10):
+            async with async_timeout.timeout(BASE_TIMEOUT + len(api.things) * 2):
                 await hass.async_add_executor_job(api.refresh_status)
                 hass.data[UPDATED_DATA] = api.get_status(legacy=True)
 
@@ -172,7 +168,7 @@ async def async_setup_entry(hass, config_entry):
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
-            async with async_timeout.timeout(10):
+            async with async_timeout.timeout(BASE_TIMEOUT + len(api.things) * 2):
                 await hass.async_add_executor_job(api.refresh_status)
                 hass.data[UPDATED_DATA] = api.get_status(legacy=True)
 
@@ -214,6 +210,14 @@ async def async_setup_entry(hass, config_entry):
     return True
 
 
+@dataclass
+class UpdateData:
+    status_name : str
+    device_name : str
+    status_value : Optional[int] = field(default_factory=None)
+    status_str_value : Optional[str] = field(default_factory=None)
+
+
 class JciHitachiEntity(CoordinatorEntity):
     def __init__(self, thing, coordinator):
         super().__init__(coordinator)
@@ -243,10 +247,15 @@ class JciHitachiEntity(CoordinatorEntity):
         """Return the thing's unique id."""
         raise NotImplementedError
     
-    def put_queue(self, command, value, device_name):
+    def put_queue(self, status_name, status_value=None, status_str_value=None):
         """Put data into the queue to update status"""
         self.hass.data[UPDATE_DATA].put(
-            UpdateData(command, value, device_name)
+            UpdateData(
+                status_name=status_name,
+                device_name=self._thing.name,
+                status_value=status_value,
+                status_str_value=status_str_value
+            )
         )
     
     def update(self):
@@ -256,7 +265,7 @@ class JciHitachiEntity(CoordinatorEntity):
         while self.hass.data[UPDATE_DATA].qsize() > 0:
             data = self.hass.data[UPDATE_DATA].get()
             _LOGGER.debug(f"Updating data: {data}")
-            result = api.set_status(*data)
+            result = api.set_status(**vars(data))
             if result is True:
                 _LOGGER.debug(f"Data: {data} updated successfully.")
             else:
@@ -271,9 +280,3 @@ class JciHitachiEntity(CoordinatorEntity):
         
         # Important: We have to reset the update scheduler to prevent old status from wrongly being loaded. 
         self.coordinator.async_set_updated_data(None)
-
-
-class UpdateData(NamedTuple):
-    command : str
-    value : int
-    device_name : str

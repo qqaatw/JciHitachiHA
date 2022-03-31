@@ -2,31 +2,24 @@
 import logging
 
 from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate.const import (
-    FAN_AUTO,
-    FAN_DIFFUSE,
-    FAN_FOCUS,
-    FAN_HIGH,
-    FAN_LOW,
-    FAN_MEDIUM,
-    SWING_OFF,
-    SWING_VERTICAL,
-    SWING_HORIZONTAL,
-    SWING_BOTH,
-    HVAC_MODE_AUTO,
-    HVAC_MODE_COOL,
-    HVAC_MODE_DRY,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_OFF,
-    PRESET_NONE,
-    PRESET_BOOST,
-    PRESET_ECO,
-    SUPPORT_FAN_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
-    SUPPORT_PRESET_MODE,
-    SUPPORT_SWING_MODE
-)
+from homeassistant.components.climate.const import (FAN_AUTO, FAN_DIFFUSE,
+                                                    FAN_FOCUS, FAN_HIGH,
+                                                    FAN_LOW, FAN_MEDIUM,
+                                                    HVAC_MODE_AUTO,
+                                                    HVAC_MODE_COOL,
+                                                    HVAC_MODE_DRY,
+                                                    HVAC_MODE_FAN_ONLY,
+                                                    HVAC_MODE_HEAT,
+                                                    HVAC_MODE_OFF,
+                                                    PRESET_BOOST, PRESET_ECO,
+                                                    PRESET_NONE,
+                                                    SUPPORT_FAN_MODE,
+                                                    SUPPORT_PRESET_MODE,
+                                                    SUPPORT_SWING_MODE,
+                                                    SUPPORT_TARGET_TEMPERATURE,
+                                                    SWING_BOTH,
+                                                    SWING_HORIZONTAL,
+                                                    SWING_OFF, SWING_VERTICAL)
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 
 from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
@@ -244,7 +237,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     def turn_on(self):
         """Turn the device on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("power", 1, self._thing.name)
+        self.put_queue(status_name="power", status_str_value="on")
         self.update()
         
     def set_hvac_mode(self, hvac_mode):
@@ -254,20 +247,20 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
         status = self.hass.data[UPDATED_DATA][self._thing.name]
         if status.power == "off" and hvac_mode != HVAC_MODE_OFF:
-            self.put_queue("power", 1, self._thing.name)
+            self.put_queue(status_name="power", status_str_value="on")
 
         if hvac_mode == HVAC_MODE_OFF:
-            self.put_queue("power", 0, self._thing.name)
+            self.put_queue(status_name="power", status_str_value="off")
         elif hvac_mode == HVAC_MODE_COOL:
-            self.put_queue("mode", 0, self._thing.name)
+            self.put_queue(status_name="mode", status_str_value="cool")
         elif hvac_mode == HVAC_MODE_DRY:
-            self.put_queue("mode", 1, self._thing.name)
+            self.put_queue(status_name="mode", status_str_value="dry")
         elif hvac_mode == HVAC_MODE_FAN_ONLY:
-            self.put_queue("mode", 2, self._thing.name)
+            self.put_queue(status_name="mode", status_str_value="fan")
         elif hvac_mode == HVAC_MODE_AUTO:
-            self.put_queue("mode", 3, self._thing.name)
+            self.put_queue(status_name="mode", status_str_value="auto")
         elif hvac_mode == HVAC_MODE_HEAT:
-            self.put_queue("mode", 4, self._thing.name)
+            self.put_queue(status_name="mode", status_str_value="heat")
         else:
             _LOGGER.error("Invalid hvac_mode.")
         self.update()
@@ -278,25 +271,25 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         _LOGGER.debug(f"Set {self.name} preset_mode to {preset_mode}")
         
         if preset_mode == PRESET_ECO_MOLD_PREVENTION:
-            self.put_queue("energy_save", 1, self._thing.name)
-            self.put_queue("mold_prev", 1, self._thing.name)
-            self.put_queue("fast_op", 0, self._thing.name)
+            self.put_queue(status_name="energy_save", status_str_value="enabled")
+            self.put_queue(status_name="mold_prev", status_str_value="enabled")
+            self.put_queue(status_name="fast_op", status_str_value="disabled")
         elif preset_mode == PRESET_ECO:
-            self.put_queue("energy_save", 1, self._thing.name)
-            self.put_queue("mold_prev", 0, self._thing.name)
-            self.put_queue("fast_op", 0, self._thing.name)
+            self.put_queue(status_name="energy_save", status_str_value="enabled")
+            self.put_queue(status_name="mold_prev", status_str_value="disabled")
+            self.put_queue(status_name="fast_op", status_str_value="disabled")
         elif preset_mode == PRESET_MOLD_PREVENTION:
-            self.put_queue("energy_save", 0, self._thing.name)
-            self.put_queue("mold_prev", 1, self._thing.name)
-            self.put_queue("fast_op", 0, self._thing.name)
+            self.put_queue(status_name="energy_save", status_str_value="disabled")
+            self.put_queue(status_name="mold_prev", status_str_value="enabled")
+            self.put_queue(status_name="fast_op", status_str_value="disabled")
         elif preset_mode == PRESET_BOOST:
-            self.put_queue("energy_save", 0, self._thing.name)
-            self.put_queue("mold_prev", 0, self._thing.name)
-            self.put_queue("fast_op", 1, self._thing.name)
+            self.put_queue(status_name="energy_save", status_str_value="disabled")
+            self.put_queue(status_name="mold_prev", status_str_value="disabled")
+            self.put_queue(status_name="fast_op", status_str_value="enabled")
         elif preset_mode == PRESET_NONE:
-            self.put_queue("energy_save", 0, self._thing.name)
-            self.put_queue("mold_prev", 0, self._thing.name)
-            self.put_queue("fast_op", 0, self._thing.name)
+            self.put_queue(status_name="energy_save", status_str_value="disabled")
+            self.put_queue(status_name="mold_prev", status_str_value="disabled")
+            self.put_queue(status_name="fast_op", status_str_value="disabled")
         else:
             _LOGGER.error("Invalid preset_mode.")
         self.update()
@@ -307,13 +300,13 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         _LOGGER.debug(f"Set {self.name} fan_mode to {fan_mode}")
 
         if fan_mode == FAN_AUTO:
-            self.put_queue("air_speed", 0, self._thing.name)
+            self.put_queue(status_name="air_speed", status_str_value="auto")
         elif fan_mode == FAN_LOW:
-            self.put_queue("air_speed", 1, self._thing.name)
+            self.put_queue(status_name="air_speed", status_str_value="silent")
         elif fan_mode == FAN_MEDIUM:
-            self.put_queue("air_speed", 3, self._thing.name)
+            self.put_queue(status_name="air_speed", status_str_value="moderate")
         elif fan_mode == FAN_HIGH:
-            self.put_queue("air_speed", 4, self._thing.name)
+            self.put_queue(status_name="air_speed", status_str_value="high")
         else:
             _LOGGER.error("Invalid fan_mode.")
         self.update()
@@ -324,17 +317,17 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         _LOGGER.debug(f"Set {self.name} swing_mode to {swing_mode}")
 
         if swing_mode == SWING_OFF:
-            self.put_queue("vertical_wind_swingable", 0, self._thing.name)
-            self.put_queue("horizontal_wind_direction", 3, self._thing.name)
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="disabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="central")
         elif swing_mode == SWING_VERTICAL:
-            self.put_queue("vertical_wind_swingable", 1, self._thing.name)
-            self.put_queue("horizontal_wind_direction", 3, self._thing.name)
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="enabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="central")
         elif swing_mode == SWING_HORIZONTAL:
-            self.put_queue("vertical_wind_swingable", 0, self._thing.name)
-            self.put_queue("horizontal_wind_direction", 0, self._thing.name)
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="disabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="auto")
         elif swing_mode == SWING_BOTH:
-            self.put_queue("vertical_wind_swingable", 1, self._thing.name)
-            self.put_queue("horizontal_wind_direction", 0, self._thing.name)
+            self.put_queue(status_name="vertical_wind_swingable",  status_str_value="enabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="auto")
         else:
             _LOGGER.error("Invalid swing_mode.")
         self.update()
@@ -351,5 +344,5 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         # Limit the target temperature into acceptable range.
         target_temp = min(self.max_temp, target_temp)
         target_temp = max(self.min_temp, target_temp)
-        self.put_queue("target_temp", target_temp, self._thing.name)
+        self.put_queue(status_name="target_temp", status_value=target_temp)
         self.update()

@@ -1,8 +1,9 @@
 """JciHitachi integration."""
 import logging
 
-from homeassistant.components.fan import FanEntity, SUPPORT_SET_SPEED
-from homeassistant.util.percentage import ordered_list_item_to_percentage, percentage_to_ordered_list_item
+from homeassistant.components.fan import SUPPORT_SET_SPEED, FanEntity
+from homeassistant.util.percentage import (ordered_list_item_to_percentage,
+                                           percentage_to_ordered_list_item)
 
 from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
 
@@ -103,13 +104,13 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
         _LOGGER.debug(f"Set {self.name} air speed to {air_speed}")
 
         if air_speed == "silent":
-            self.put_queue("air_speed", 1, self._thing.name)
+            self.put_queue("air_speed", status_str_value="silent")
         elif air_speed == "low":
-            self.put_queue("air_speed", 2, self._thing.name)
+            self.put_queue("air_speed", status_str_value="low")
         elif air_speed == "moderate":
-            self.put_queue("air_speed", 3, self._thing.name)
+            self.put_queue("air_speed", status_str_value="moderate")
         elif air_speed == "high":
-            self.put_queue("air_speed", 4, self._thing.name)
+            self.put_queue("air_speed", status_str_value="high")
         else:
             _LOGGER.error("Invalid air_speed.")
         self.update()
@@ -117,11 +118,11 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     def turn_on(self, **kwargs):
         """Turn the device on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("power", 1, self._thing.name)
+        self.put_queue("power", status_str_value="on")
         self.update()
 
     def turn_off(self, **kwargs):
         """Turn the device off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("power", 0, self._thing.name)
+        self.put_queue("power", status_str_value="off")
         self.update()

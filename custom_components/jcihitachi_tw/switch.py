@@ -67,13 +67,13 @@ class JciHitachiAirCleaningFilterEntity(JciHitachiEntity, SwitchEntity):
     def turn_on(self):
         """Turn air cleaning filter setting on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("air_cleaning_filter", 1, self._thing.name)
+        self.put_queue("air_cleaning_filter", status_str_value="enabled")
         self.update()
 
     def turn_off(self):
         """Turn air cleaning filter setting off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("air_cleaning_filter", 0, self._thing.name)
+        self.put_queue("air_cleaning_filter", status_str_value="disabled")
         self.update()
 
 
@@ -104,13 +104,13 @@ class JciHitachiCleanFilterNotifySwitchEntity(JciHitachiEntity, SwitchEntity):
     def turn_on(self):
         """Turn clean filter notification on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("clean_filter_notify", 1, self._thing.name)
+        self.put_queue("clean_filter_notify", status_str_value="enabled")
         self.update()
 
     def turn_off(self):
         """Turn clean filter notification off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("clean_filter_notify", 0, self._thing.name)
+        self.put_queue("clean_filter_notify", status_str_value="disabled")
         self.update()
 
 
@@ -128,7 +128,7 @@ class JciHitachiMoldPrevSwitchEntity(JciHitachiEntity, SwitchEntity):
         """Indicate whether mold prevention is on."""
         status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
-            if status.mold_prev == "off":
+            if status.mold_prev == "disabled":
                 return False
             else:
                 return True
@@ -141,13 +141,13 @@ class JciHitachiMoldPrevSwitchEntity(JciHitachiEntity, SwitchEntity):
     def turn_on(self):
         """Turn mold prevention on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("mold_prev", 1, self._thing.name)
+        self.put_queue("mold_prev", status_str_value="enabled")
         self.update()
 
     def turn_off(self):
         """Turn mold prevention off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("mold_prev", 0, self._thing.name)
+        self.put_queue("mold_prev", status_str_value="disabled")
         self.update()
 
 
@@ -165,7 +165,7 @@ class JciHitachiWindSwingableSwitchEntity(JciHitachiEntity, SwitchEntity):
         """Indicate whether wind swingable is on."""
         status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
         if status:
-            if status.wind_swingable == "off":
+            if status.wind_swingable == "disabled":
                 return False
             else:
                 return True
@@ -178,11 +178,11 @@ class JciHitachiWindSwingableSwitchEntity(JciHitachiEntity, SwitchEntity):
     def turn_on(self):
         """Turn wind swingable on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("wind_swingable", 1, self._thing.name)
+        self.put_queue("wind_swingable", status_str_value="enabled")
         self.update()
     
     def turn_off(self):
         """Turn wind swingable off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("wind_swingable", 0, self._thing.name)
+        self.put_queue("wind_swingable", status_str_value="disabled")
         self.update()

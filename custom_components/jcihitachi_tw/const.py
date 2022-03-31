@@ -1,8 +1,7 @@
 """JciHitachi integration."""
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.const import CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD
-import homeassistant.helpers.config_validation as cv
-
 
 DOMAIN = "jcihitachi_tw"
 API = "api"
