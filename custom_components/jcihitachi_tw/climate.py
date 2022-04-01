@@ -79,8 +79,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     for thing in api.things.values():
         if thing.type == "AC":
             status = hass.data[UPDATED_DATA][thing.name]
-            supported_features = JciHitachiClimateEntity.calculate_supported_features(
-                status)
+            supported_features = JciHitachiClimateEntity.calculate_supported_features(status)
             async_add_devices(
                 [JciHitachiClimateEntity(
                     thing, coordinator, supported_features)],

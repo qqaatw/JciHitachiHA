@@ -33,9 +33,9 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Power 電源
   - Mode 運轉模式
   - Air speed 風速
-  - Vertical wind swingable 導風板垂直擺動 (Untested)
-  - Vertical wind direction 導風板垂直方向 (Untested)
-  - Horizontal wind direction 導風板水平方向 (Untested)
+  - Vertical wind swingable 導風板垂直擺動
+  - Vertical wind direction 導風板垂直方向
+  - Horizontal wind direction 導風板水平方向
   - Target temperature 目標溫度
   - Indoor temperature 室內溫度
   - Mold prevention 機體防霉
@@ -44,6 +44,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Power consumption 用電統計 (supports HA core v2021.9.0+)
   - Monthly power consumption 月用電統計
   - ~~Sleep timer 睡眠計時器~~ (Only supported by LibJciHitachi)
+  - ~~Freeze clean 凍結洗淨~~ (Only supported by LibJciHitachi)
 - Hitachi Dehumidifier 日立除濕機
   - Power 電源
   - Mode 運轉模式
@@ -87,6 +88,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 ## Known issues
 
 1. Clean filter notification of the dehumidifier doesn't work now.
+2. The backend installation is now managed by the integration [itself](https://github.com/qqaatw/JciHitachiHA/blob/develop/custom_components/jcihitachi_tw/__init__.py#L21-L25) instead of HA because the dependent package [awscrt](https://github.com/awslabs/aws-crt-python) that the backend uses doesn't provide binary wheels for musl-based linux like Alpine, which is the base image of Home Assistant Container. Thus, an additional package [source](https://github.com/qqaatw/aws-crt-python-musllinux) having these binary wheels needs to be specified, and that is what the custom package management in this integration does.
 
 ## License
 

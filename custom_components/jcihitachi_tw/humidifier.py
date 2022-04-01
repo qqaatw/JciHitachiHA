@@ -157,21 +157,21 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         _LOGGER.debug(f"Set {self.name} mode to {mode}")
 
         if mode == MODE_AUTO:
-            self.put_queue("mode", status_str_value="auto")
+            self.put_queue(status_name="mode", status_str_value="auto")
         elif mode == MODE_CUSTOM:
-            self.put_queue("mode", status_str_value="custom")
+            self.put_queue(status_name="mode", status_str_value="custom")
         elif mode == MODE_CONTINUOUS:
-            self.put_queue("mode", status_str_value="continuous")
+            self.put_queue(status_name="mode", status_str_value="continuous")
         elif mode == MODE_CLOTHES_DRY:
-            self.put_queue("mode", status_str_value="clothes_dry")
+            self.put_queue(status_name="mode", status_str_value="clothes_dry")
         elif mode == MODE_AIR_PURIFY:
-            self.put_queue("mode", status_str_value="air_purify")
+            self.put_queue(status_name="mode", status_str_value="air_purify")
         elif mode == MODE_MOLD_PREV:
-            self.put_queue("mode", status_str_value="mold_prev")
+            self.put_queue(status_name="mode", status_str_value="mold_prev")
         elif mode == MODE_LOW_HUMIDITY:
-            self.put_queue("mode", status_str_value="low_humidity")
+            self.put_queue(status_name="mode", status_str_value="low_humidity")
         elif mode == MODE_ECO_COMFORT:
-            self.put_queue("mode", status_str_value="eco_comfort")
+            self.put_queue(status_name="mode", status_str_value="eco_comfort")
         else:
             _LOGGER.error("Invalid mode.")
         self.update()
@@ -182,19 +182,19 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         target_humidity = int(humidity)
         _LOGGER.debug(f"Set {self.name} humidity to {target_humidity}")
 
-        self.put_queue("target_humidity", target_humidity, self._thing.name)
+        self.put_queue(status_name="target_humidity", status_value=target_humidity)
         self.update()
     
     def turn_on(self, **kwargs):
         """Turn the device on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("power", status_str_value="on")
+        self.put_queue(status_name="power", status_str_value="on")
         self.update()
     
     def turn_off(self, **kwargs):
         """Turn the device off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("power", status_str_value="off")
+        self.put_queue(status_name="power", status_str_value="off")
         self.update()
 
     

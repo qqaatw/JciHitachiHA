@@ -104,13 +104,13 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
         _LOGGER.debug(f"Set {self.name} air speed to {air_speed}")
 
         if air_speed == "silent":
-            self.put_queue("air_speed", status_str_value="silent")
+            self.put_queue(status_name="air_speed", status_str_value="silent")
         elif air_speed == "low":
-            self.put_queue("air_speed", status_str_value="low")
+            self.put_queue(status_name="air_speed", status_str_value="low")
         elif air_speed == "moderate":
-            self.put_queue("air_speed", status_str_value="moderate")
+            self.put_queue(status_name="air_speed", status_str_value="moderate")
         elif air_speed == "high":
-            self.put_queue("air_speed", status_str_value="high")
+            self.put_queue(status_name="air_speed", status_str_value="high")
         else:
             _LOGGER.error("Invalid air_speed.")
         self.update()
@@ -118,11 +118,11 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     def turn_on(self, **kwargs):
         """Turn the device on."""
         _LOGGER.debug(f"Turn {self.name} on")
-        self.put_queue("power", status_str_value="on")
+        self.put_queue(status_name="power", status_str_value="on")
         self.update()
 
     def turn_off(self, **kwargs):
         """Turn the device off."""
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue("power", status_str_value="off")
+        self.put_queue(status_name="power", status_str_value="off")
         self.update()
