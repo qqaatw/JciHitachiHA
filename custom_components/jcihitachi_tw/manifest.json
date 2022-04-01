@@ -2,7 +2,7 @@
   "config_flow": true,
   "domain": "jcihitachi_tw",
   "name": "JciHitachi TW",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "documentation": "https://github.com/qqaatw/JciHitachiHA",
   "issue_tracker": "https://github.com/qqaatw/JciHitachiHA/issues",
   "requirements": [],

@@ -1,9 +1,5 @@
 # Jci-Hitachi Home Assistant Integration
 
-**Help wanted: I've been developing the heat exchanger support, but I've no such device to test its functionality. If you want to help with the development, please contact me via email: `qqaatw[a-t]gmail.com`. Thank you.**
-
-**Help wanted: 我目前正在開發支援全熱交換機，但是沒有裝置可以測試。若您願意協助此功能的開發，請透過email: `qqaatw[a-t]gmail.com` 聯繫我。Thank you.**
-
 ## Feature
 A home assistant integration for controlling Jci Hitachi devices, using [LibJciHitachi](https://github.com/qqaatw/LibJciHitachi) backend.
 
@@ -88,7 +84,6 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 ## Known issues
 
 1. Clean filter notification of the dehumidifier doesn't work now.
-2. The backend installation is now managed by the integration [itself](https://github.com/qqaatw/JciHitachiHA/blob/develop/custom_components/jcihitachi_tw/__init__.py#L21-L25) instead of HA because the dependent package [awscrt](https://github.com/awslabs/aws-crt-python) that the backend uses doesn't provide binary wheels for musl-based linux like Alpine, which is the base image of Home Assistant Container. Thus, an additional package [source](https://github.com/qqaatw/aws-crt-python-musllinux) having these binary wheels needs to be specified, and that is what the custom package management in this integration does.
 
 ## License
 

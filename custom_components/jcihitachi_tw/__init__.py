@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass, field
 from datetime import timedelta
 from queue import Queue
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import async_timeout
 from homeassistant.helpers import discovery
@@ -18,18 +18,19 @@ from .const import (API, CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD, CONF_RETRY,
                     CONFIG_SCHEMA, COORDINATOR, DOMAIN, MONTHLY_DATA,
                     UPDATE_DATA, UPDATED_DATA)
 
-custom_required_packages = ["LibJciHitachi==0.4.7"]
-
-for pkg in custom_required_packages:
-    if not is_installed(pkg) and install_package(pkg, find_links="https://qqaatw.github.io/aws-crt-python-musllinux/"):
-        raise RequirementsNotFound(DOMAIN, [pkg])
-
-from JciHitachi.api import JciHitachiAWSAPI
-
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "number", "sensor", "switch"]
 DATA_UPDATE_INTERVAL = timedelta(seconds=30)
 BASE_TIMEOUT = 5
+
+if TYPE_CHECKING:
+    from JciHitachi.api import JciHitachiAWSAPI
+
+def _lazy_install():
+    custom_required_packages = ["LibJciHitachi==0.5.0"]
+    for pkg in custom_required_packages:
+        if not is_installed(pkg) and not install_package(pkg, find_links="https://qqaatw.github.io/aws-crt-python-musllinux/"):
+            raise RequirementsNotFound(DOMAIN, [pkg])
 
 async def async_setup(hass, config):
     """Set up from the configuration.yaml"""
@@ -47,6 +48,9 @@ async def async_setup(hass, config):
 
     if config[DOMAIN].get(CONF_DEVICES) == []:
         config[DOMAIN][CONF_DEVICES] = None
+
+    _lazy_install()
+    from JciHitachi.api import JciHitachiAWSAPI
 
     api = JciHitachiAWSAPI(
         email=config[DOMAIN].get(CONF_EMAIL),
@@ -133,6 +137,9 @@ async def async_setup_entry(hass, config_entry):
 
     if config.get(CONF_DEVICES) == []:
         config[CONF_DEVICES] = None
+
+    _lazy_install()
+    from JciHitachi.api import JciHitachiAWSAPI
 
     api = JciHitachiAWSAPI(
         email=config.get(CONF_EMAIL),
