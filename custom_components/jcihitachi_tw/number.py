@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.components.number import NumberEntity
 
-from . import API, COORDINATOR, MONTHLY_DATA, JciHitachiEntity
+from . import API, COORDINATOR, DOMAIN, MONTHLY_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -11,8 +11,8 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the number platform."""
     
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         async_add_entities(
@@ -26,8 +26,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the number platform from a config entry."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         async_add_devices(
@@ -72,6 +72,6 @@ class JciHitachiMonthlyDataSelectorNumberEntity(JciHitachiEntity, NumberEntity):
         _LOGGER.debug(f"Set {self.name} value to {value}")
         self._value = value
 
-        api = self.hass.data[API]
-        self.hass.data[MONTHLY_DATA] = api.get_monthly_data(int(self._value), self._thing.name)
+        api = self.hass.data[DOMAIN][API]
+        self.hass.data[DOMAIN][MONTHLY_DATA] = api.get_monthly_data(int(self._value), self._thing.name)
         self.update()

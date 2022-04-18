@@ -5,7 +5,7 @@ from homeassistant.components.humidifier import HumidifierEntity
 from homeassistant.components.humidifier.const import (
     DEVICE_CLASS_DEHUMIDIFIER, SUPPORT_MODES)
 
-from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
+from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,12 +33,12 @@ AVAILABLE_MODES = [
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the humidifier platform."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
-            status = hass.data[UPDATED_DATA][thing.name]
+            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
             supported_features = JciHitachiDehumidifierEntity.calculate_supported_features(
                 status
             )
@@ -52,12 +52,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the humidifier platform from a config entry."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
-            status = hass.data[UPDATED_DATA][thing.name]
+            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
             supported_features = JciHitachiDehumidifierEntity.calculate_supported_features(
                 status
             )
@@ -81,7 +81,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     @property
     def target_humidity(self):
         """Return the current temperature."""
-        status = self.hass.data[UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
             return status.target_humidity
         return None
@@ -89,18 +89,18 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     @property
     def max_humidity(self):
         """Return the maximum humidity."""
-        status = self.hass.data[UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         return status.max_humidity
     
     @property
     def min_humidity(self):
         """Return the minimum humidity."""
-        status = self.hass.data[UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         return status.min_humidity
     
     @property
     def mode(self):
-        status = self.hass.data[UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
             if status.mode == "auto":
                 return MODE_AUTO
@@ -128,7 +128,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
 
     @property
     def is_on(self):
-        status = self.hass.data[UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
             if status.power == "off":
                 return False

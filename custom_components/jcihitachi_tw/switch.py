@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.components.switch import SwitchEntity
 
-from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
+from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -11,8 +11,8 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the switch platform."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
@@ -27,8 +27,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the switch platform from a config entry."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
@@ -52,7 +52,7 @@ class JciHitachiAirCleaningFilterEntity(JciHitachiEntity, SwitchEntity):
     @property
     def is_on(self):
         """Indicate whether air cleaning filter setting is on."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.air_cleaning_filter == "disabled":
                 return False
@@ -89,7 +89,7 @@ class JciHitachiCleanFilterNotifySwitchEntity(JciHitachiEntity, SwitchEntity):
     @property
     def is_on(self):
         """Indicate whether clean filter notification is on."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.clean_filter_notify == "disabled":
                 return False
@@ -126,7 +126,7 @@ class JciHitachiMoldPrevSwitchEntity(JciHitachiEntity, SwitchEntity):
     @property
     def is_on(self):
         """Indicate whether mold prevention is on."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.mold_prev == "disabled":
                 return False
@@ -163,7 +163,7 @@ class JciHitachiWindSwingableSwitchEntity(JciHitachiEntity, SwitchEntity):
     @property
     def is_on(self):
         """Indicate whether wind swingable is on."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.wind_swingable == "disabled":
                 return False

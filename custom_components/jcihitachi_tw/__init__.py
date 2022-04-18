@@ -60,11 +60,12 @@ async def async_setup(hass, config):
         max_retries=config[DOMAIN].get(CONF_RETRY),
     )
 
-    hass.data[API] = api
-    hass.data[MONTHLY_DATA] = list()
-    hass.data[UPDATE_DATA] = Queue()
-    hass.data[UPDATED_DATA] = dict()
-    hass.data[COORDINATOR] = None
+    hass.data[DOMAIN] = {}
+    hass.data[DOMAIN][API] = api
+    hass.data[DOMAIN][MONTHLY_DATA] = list()
+    hass.data[DOMAIN][UPDATE_DATA] = Queue()
+    hass.data[DOMAIN][UPDATED_DATA] = dict()
+    hass.data[DOMAIN][COORDINATOR] = None
 
     try:
         await hass.async_add_executor_job(api.login)
@@ -89,7 +90,7 @@ async def async_setup(hass, config):
             # handled by the data update coordinator.
             async with async_timeout.timeout(BASE_TIMEOUT + len(api.things) * 2):
                 await hass.async_add_executor_job(api.refresh_status)
-                hass.data[UPDATED_DATA] = api.get_status(legacy=True)
+                hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
 
         except asyncio.TimeoutError as err:
             raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
@@ -98,7 +99,7 @@ async def async_setup(hass, config):
             raise UpdateFailed(f"Error communicating with API: {err}")
         
         _LOGGER.debug(
-            f"Latest data: {[(name, value.status) for name, value in hass.data[UPDATED_DATA].items()]}")
+            f"Latest data: {[(name, value.status) for name, value in hass.data[DOMAIN][UPDATED_DATA].items()]}")
 
     coordinator = DataUpdateCoordinator(
         hass,
@@ -112,10 +113,10 @@ async def async_setup(hass, config):
 
     await coordinator.async_refresh()
 
-    hass.data[COORDINATOR] = coordinator
+    hass.data[DOMAIN][COORDINATOR] = coordinator
     
     # Start jcihitachi components
-    if hass.data[API]:
+    if hass.data[DOMAIN][API]:
         _LOGGER.debug("Starting JciHitachi components.")
         for platform in PLATFORMS:
             discovery.load_platform(hass, platform, DOMAIN, {}, config)
@@ -149,11 +150,12 @@ async def async_setup_entry(hass, config_entry):
         max_retries=config.get(CONF_RETRY),
     )
 
-    hass.data[API] = api
-    hass.data[MONTHLY_DATA] = list()
-    hass.data[UPDATE_DATA] = Queue()
-    hass.data[UPDATED_DATA] = dict()
-    hass.data[COORDINATOR] = None
+    hass.data[DOMAIN] = {}
+    hass.data[DOMAIN][API] = api
+    hass.data[DOMAIN][MONTHLY_DATA] = list()
+    hass.data[DOMAIN][UPDATE_DATA] = Queue()
+    hass.data[DOMAIN][UPDATED_DATA] = dict()
+    hass.data[DOMAIN][COORDINATOR] = None
 
     try:
         await hass.async_add_executor_job(api.login)
@@ -178,7 +180,7 @@ async def async_setup_entry(hass, config_entry):
             # handled by the data update coordinator.
             async with async_timeout.timeout(BASE_TIMEOUT + len(api.things) * 2):
                 await hass.async_add_executor_job(api.refresh_status)
-                hass.data[UPDATED_DATA] = api.get_status(legacy=True)
+                hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
 
         except asyncio.TimeoutError as err:
             raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
@@ -187,7 +189,7 @@ async def async_setup_entry(hass, config_entry):
             raise UpdateFailed(f"Error communicating with API: {err}")
 
         _LOGGER.debug(
-            f"Latest data: {[(name, value.status) for name, value in hass.data[UPDATED_DATA].items()]}")
+            f"Latest data: {[(name, value.status) for name, value in hass.data[DOMAIN][UPDATED_DATA].items()]}")
 
     def _async_forward_entry_setup():
         for platform in PLATFORMS:
@@ -207,10 +209,10 @@ async def async_setup_entry(hass, config_entry):
 
     await coordinator.async_refresh()
 
-    hass.data[COORDINATOR] = coordinator
+    hass.data[DOMAIN][COORDINATOR] = coordinator
     
     # Start jcihitachi components
-    if hass.data[API]:
+    if hass.data[DOMAIN][API]:
         _LOGGER.debug("Starting JciHitachi components.")
         _async_forward_entry_setup()
     
@@ -257,7 +259,7 @@ class JciHitachiEntity(CoordinatorEntity):
     
     def put_queue(self, status_name, status_value=None, status_str_value=None):
         """Put data into the queue to update status"""
-        self.hass.data[UPDATE_DATA].put(
+        self.hass.data[DOMAIN][UPDATE_DATA].put(
             UpdateData(
                 status_name=status_name,
                 device_name=self._thing.name,
@@ -268,10 +270,10 @@ class JciHitachiEntity(CoordinatorEntity):
     
     def update(self):
         """Update latest status."""
-        api = self.hass.data[API]
+        api = self.hass.data[DOMAIN][API]
 
-        while self.hass.data[UPDATE_DATA].qsize() > 0:
-            data = self.hass.data[UPDATE_DATA].get()
+        while self.hass.data[DOMAIN][UPDATE_DATA].qsize() > 0:
+            data = self.hass.data[DOMAIN][UPDATE_DATA].get()
             _LOGGER.debug(f"Updating data: {data}")
             result = api.set_status(**vars(data))
             if result is True:
@@ -280,10 +282,10 @@ class JciHitachiEntity(CoordinatorEntity):
                 _LOGGER.error("Failed to update data.")
 
         # Here we don't need to refresh status as it was refreshed by `api.set_status`.
-        self.hass.data[UPDATED_DATA] = api.get_status(legacy=True)
+        self.hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
         
         _LOGGER.debug(
-            f"Latest data: {[(name, value.status) for name, value in self.hass.data[UPDATED_DATA].items()]}"
+            f"Latest data: {[(name, value.status) for name, value in self.hass.data[DOMAIN][UPDATED_DATA].items()]}"
         )
         
         # Important: We have to reset the update scheduler to prevent old status from wrongly being loaded. 

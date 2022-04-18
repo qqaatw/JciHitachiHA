@@ -10,7 +10,7 @@ from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
                                  DEVICE_CLASS_HUMIDITY, DEVICE_CLASS_PM25,
                                  ENERGY_KILO_WATT_HOUR, PERCENTAGE)
 
-from . import API, COORDINATOR, MONTHLY_DATA, UPDATED_DATA, JciHitachiEntity
+from . import API, COORDINATOR, DOMAIN, MONTHLY_DATA, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,8 +22,8 @@ ODOR_LEVEL_HIGH = "High"
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
     
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "AC":
@@ -48,8 +48,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the sensor platform from a config entry."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "AC":
@@ -80,7 +80,7 @@ class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def state(self):
         """Return the indoor humidity."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.indoor_humidity
         return None
@@ -112,7 +112,7 @@ class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def state(self):
         """Return the PM2.5 value."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.pm25_value
         return None
@@ -144,7 +144,7 @@ class JciHitachiOdorLevelSensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def state(self):
         """Return the odor level."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.odor_level == "low":
                 return ODOR_LEVEL_LOW
@@ -171,7 +171,7 @@ class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def state(self):
         """Return the power consumption in KW/H"""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.power_kwh
         return None
@@ -206,7 +206,7 @@ class JciHitachiMonthlyPowerConsumptionSensorEntity(JciHitachiEntity, SensorEnti
     @property
     def state(self):
         """Return the monthly power consumption in KW/H"""
-        monthly_data = self.hass.data[MONTHLY_DATA]
+        monthly_data = self.hass.data[DOMAIN][MONTHLY_DATA]
         if monthly_data:
             return monthly_data[0]["PowerConsumption_Sum"] / 10
         return -1
@@ -249,7 +249,7 @@ class JciHitachiMonthIndicatorSensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the month in datetime.date object."""
-        monthly_data = self.hass.data[MONTHLY_DATA]
+        monthly_data = self.hass.data[DOMAIN][MONTHLY_DATA]
         if monthly_data:
             return datetime.date.fromtimestamp(monthly_data[0]["Timestamp"] / 1000)
         return None

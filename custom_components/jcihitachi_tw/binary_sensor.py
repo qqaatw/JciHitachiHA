@@ -4,7 +4,7 @@ import logging
 from homeassistant.components.binary_sensor import (DEVICE_CLASS_PROBLEM,
                                                     BinarySensorEntity)
 
-from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
+from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,8 +12,8 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the binary sensor platform."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
@@ -26,8 +26,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the binary sensor platform from a config entry."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
@@ -49,7 +49,7 @@ class JciHitachiErrorBinarySensorEntity(JciHitachiEntity, BinarySensorEntity):
     @property
     def is_on(self):
         """Indicate whether an error occurred."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.error_code == 0:
                 return False
@@ -78,7 +78,7 @@ class JciHitachiWaterFullBinarySensorEntity(JciHitachiEntity, BinarySensorEntity
     @property
     def is_on(self):
         """Indicate whether the water tank is full."""
-        status = self.hass.data[UPDATED_DATA].get(self._thing.name, None)
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.water_full_warning == "off":
                 return False

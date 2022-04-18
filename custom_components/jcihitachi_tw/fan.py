@@ -5,7 +5,7 @@ from homeassistant.components.fan import SUPPORT_SET_SPEED, FanEntity
 from homeassistant.util.percentage import (ordered_list_item_to_percentage,
                                            percentage_to_ordered_list_item)
 
-from . import API, COORDINATOR, UPDATED_DATA, JciHitachiEntity
+from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,12 +15,12 @@ ORDERED_NAMED_FAN_SPEEDS = ["silent", "low", "moderate", "high"]
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the fan platform."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
-            status = hass.data[UPDATED_DATA][thing.name]
+            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
             supported_features = JciHitachiDehumidifierFanEntity.calculate_supported_features(
                 status
             )
@@ -33,12 +33,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the fan platform from a config entry."""
 
-    api = hass.data[API]
-    coordinator = hass.data[COORDINATOR]
+    api = hass.data[DOMAIN][API]
+    coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
-            status = hass.data[UPDATED_DATA][thing.name]
+            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
             supported_features = JciHitachiDehumidifierFanEntity.calculate_supported_features(
                 status
             )
@@ -66,7 +66,7 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     @property
     def is_on(self):
         """Return true if the entity is on"""
-        status = self.hass.data[UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
             if status.power == "off":
                 return False
@@ -79,7 +79,7 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     @property
     def percentage(self):
         """Return the current speed percentage."""
-        status = self.hass.data[UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         return ordered_list_item_to_percentage(ORDERED_NAMED_FAN_SPEEDS, status.air_speed)
     
     @property
