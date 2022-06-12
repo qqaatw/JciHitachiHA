@@ -6,7 +6,6 @@ from homeassistant.const import CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD
 DOMAIN = "jcihitachi_tw"
 API = "api"
 COORDINATOR = "coordinator"
-MONTHLY_DATA = "monthly_data"
 UPDATE_DATA = "update_data"
 UPDATED_DATA = "updated_data"
 

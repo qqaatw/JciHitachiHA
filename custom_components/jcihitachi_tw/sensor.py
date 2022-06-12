@@ -10,7 +10,7 @@ from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
                                  DEVICE_CLASS_HUMIDITY, DEVICE_CLASS_PM25,
                                  ENERGY_KILO_WATT_HOUR, PERCENTAGE)
 
-from . import (API, COORDINATOR, DOMAIN, MONTHLY_DATA, UPDATED_DATA,
+from . import (API, COORDINATOR, DOMAIN, UPDATED_DATA,
                JciHitachiEntity)
 
 _LOGGER = logging.getLogger(__name__)

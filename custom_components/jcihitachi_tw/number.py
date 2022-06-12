@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.components.number import NumberEntity
 
-from . import API, COORDINATOR, DOMAIN, MONTHLY_DATA, JciHitachiEntity
+from . import API, COORDINATOR, DOMAIN, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -15,7 +15,7 @@ from homeassistant.requirements import RequirementsNotFound
 from homeassistant.util.package import install_package, is_installed
 
 from .const import (API, CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD, CONF_RETRY,
-                    CONFIG_SCHEMA, COORDINATOR, DOMAIN, MONTHLY_DATA,
+                    CONFIG_SCHEMA, COORDINATOR, DOMAIN,
                     UPDATE_DATA, UPDATED_DATA)
 
 _LOGGER = logging.getLogger(__name__)
@@ -62,7 +62,6 @@ async def async_setup(hass, config):
 
     hass.data[DOMAIN] = {}
     hass.data[DOMAIN][API] = api
-    hass.data[DOMAIN][MONTHLY_DATA] = list()
     hass.data[DOMAIN][UPDATE_DATA] = Queue()
     hass.data[DOMAIN][UPDATED_DATA] = dict()
     hass.data[DOMAIN][COORDINATOR] = None
@@ -152,7 +151,6 @@ async def async_setup_entry(hass, config_entry):
 
     hass.data[DOMAIN] = {}
     hass.data[DOMAIN][API] = api
-    hass.data[DOMAIN][MONTHLY_DATA] = list()
     hass.data[DOMAIN][UPDATE_DATA] = Queue()
     hass.data[DOMAIN][UPDATED_DATA] = dict()
     hass.data[DOMAIN][COORDINATOR] = None
