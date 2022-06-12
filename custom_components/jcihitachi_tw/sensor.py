@@ -207,7 +207,7 @@ class JciHitachiMonthlyPowerConsumptionSensorEntity(JciHitachiEntity, SensorEnti
     @property
     def state(self):
         """Return the monthly power consumption in KW/H"""
-        monthly_data = self.hass.data[DOMAIN][MONTHLY_DATA]
+        monthly_data = self._thing.monthly_data
         if monthly_data:
             return monthly_data[0]["PowerConsumption_Sum"] / 10
         return -1
@@ -250,7 +250,7 @@ class JciHitachiMonthIndicatorSensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the month in datetime.date object."""
-        monthly_data = self.hass.data[DOMAIN][MONTHLY_DATA]
+        monthly_data = self._thing.monthly_data
         if monthly_data:
             return datetime.date.fromtimestamp(monthly_data[0]["Timestamp"] / 1000)
         return None

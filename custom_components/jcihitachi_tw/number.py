@@ -73,5 +73,5 @@ class JciHitachiMonthlyDataSelectorNumberEntity(JciHitachiEntity, NumberEntity):
         self._value = value
 
         api = self.hass.data[DOMAIN][API]
-        self.hass.data[DOMAIN][MONTHLY_DATA] = api.get_monthly_data(int(self._value), self._thing.name)
+        api.refresh_monthly_data(int(self._value), self._thing.name)
         self.update()
