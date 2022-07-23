@@ -26,10 +26,21 @@ from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+FAN_SILENT = "silent"
+FAN_RAPID = "rapid"
+FAN_EXPRESS = "express"
 PRESET_MOLD_PREVENTION = "Mold Prev"
 PRESET_ECO_MOLD_PREVENTION = "Eco & Mold Prev"
 
-SUPPORT_FAN = [FAN_AUTO, FAN_LOW, FAN_MEDIUM, FAN_HIGH]
+SUPPORT_FAN = [
+    FAN_AUTO,
+    FAN_SILENT,    
+    FAN_LOW,
+    FAN_MEDIUM,
+    FAN_HIGH,
+    FAN_RAPID,
+    FAN_EXPRESS
+]
 SUPPORT_SWING = [
     SWING_OFF,
     SWING_VERTICAL,
@@ -61,11 +72,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     for thing in api.things.values():
         if thing.type == "AC":
-            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
-            supported_features = JciHitachiClimateEntity.calculate_supported_features(status)
             async_add_entities(
-                [JciHitachiClimateEntity(
-                    thing, coordinator, supported_features)],
+                [JciHitachiClimateEntity(thing, coordinator)],
                 update_before_add=True
             )
 
@@ -78,19 +86,17 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
     for thing in api.things.values():
         if thing.type == "AC":
-            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
-            supported_features = JciHitachiClimateEntity.calculate_supported_features(status)
             async_add_devices(
-                [JciHitachiClimateEntity(
-                    thing, coordinator, supported_features)],
+                [JciHitachiClimateEntity(thing, coordinator)],
                 update_before_add=True
             )
 
 
 class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
-    def __init__(self, thing, coordinator, supported_features):
+    def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-        self._supported_features = supported_features
+        self._supported_features = self.calculate_supported_features()
+        self._supported_fan_modes = [fan_mode for i, fan_mode in enumerate(SUPPORT_FAN) if 2 ** i & self._thing.support_code.FanSpeed != 0]
 
     @property
     def supported_features(self):
@@ -194,12 +200,16 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
                 return FAN_MEDIUM
             elif status.air_speed == "high":
                 return FAN_HIGH
+            elif status.air_speed == "rapid":
+                return FAN_HIGH
+            elif status.air_speed == "express":
+                return FAN_HIGH
         _LOGGER.error("Missing fan_mode.")
         return None
     
     @property
     def fan_modes(self):
-        return SUPPORT_FAN
+        return self._supported_fan_modes
     
     @property
     def swing_mode(self):
@@ -225,11 +235,10 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     def unique_id(self):
         return f"{self._thing.gateway_mac_address}_climate"
 
-    @staticmethod
-    def calculate_supported_features(status):
+    def calculate_supported_features(self):
         support_flags = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE | SUPPORT_PRESET_MODE
-        if status.horizontal_wind_direction != "unsupported" and \
-                status.vertical_wind_swingable != "unsupported":
+        if self._thing.support_code.HorizontalWindDirectionSetting != "unsupported" and \
+                self._thing.support_code.VerticalWindDirectionSwitch != "unsupported":
             support_flags |= SUPPORT_SWING_MODE
         return support_flags
 

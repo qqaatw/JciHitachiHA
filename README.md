@@ -25,7 +25,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 *支援以下使用日立雲端模組(雲端智慧控)的機種與功能*
 
-- Hitachi Air Conditioner 日立一對一冷氣
+- Hitachi Air Conditioner 日立冷氣
   - Power 電源
   - Mode 運轉模式
   - Air speed 風速
@@ -64,22 +64,43 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 ## Tested devices
 
+*Below models have been tested on my side or reported by someone whose device works normally. Unlisted models DO NOT MEAN they are not supported.*
+
 ### Air conditioner
 
-- RAD-90NJF / RAC-90NK1
-- RAC-63NK
-- RAS-50NJF / RAC-50NK
-- RAS-36NJF / RAC-36NK
-- RAS-36NK  / RAC-36NK1
-- RAS-28NJF / RAC-28NK
-- RAS-28NB / RAC-28NB
-- RA-36NV1
+- Window
+  - RA-36NV1
+  - RA-28NV1
+- Single-split and multi-split
+  - RAD-90NJF / RAC-90NK1
+  - RAS-81NK
+  - RAC-63NK
+  - RAS-50NJF / RAC-50NK
+  - RAS-40NK
+  - RAS-36NJF / RAC-36NK
+  - RAS-36NK  / RAC-36NK1
+  - RAS-28NJF / RAC-28NK
+  - RAS-28NB / RAC-28NB
+- Business
+  - RPI-90FK
+  - RPI-36FR
+  - RPI-28FT
+  - RPI-22FC
 
 ### Dehumidifier
 
 - RD-360HH
 - RD-240HH
 - RD-200HH
+- RDI-640HH
+- RDI-360DX
+
+## Frequently asked questions
+
+1. I cannot install the integration, the log indicates `Requirements for jcihitachi_tw not found: ['LibJciHitachi==x.x.x']`, where x is an arbitrary version number.
+    - Ensure your the OS in which your Home Assistant is installed is of the following types: `Windows`, `macOS`, `manylinux`, and `musllinux`. Only 64 bit OSes are supported on ARM platforms, e.g. Raspberry PI. Other platforms such as PowerPC and MIPS are not supported.
+2. When auto mode is set, the target temperature indicates `65535` or some huge number.
+    - It is normal. Technically, because the target temperature changes automatically under auto mode, the value is set 2-complement `-1` in 16 bit data type by Hitachi cloud.
 
 ## Known issues
 

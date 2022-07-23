@@ -15,8 +15,8 @@ from homeassistant.requirements import RequirementsNotFound
 from homeassistant.util.package import install_package, is_installed
 
 from .const import (API, CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD, CONF_RETRY,
-                    CONFIG_SCHEMA, COORDINATOR, DOMAIN,
-                    UPDATE_DATA, UPDATED_DATA)
+                    CONFIG_SCHEMA, COORDINATOR, DOMAIN, UPDATE_DATA,
+                    UPDATED_DATA)
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "number", "sensor", "switch"]
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from JciHitachi.api import JciHitachiAWSAPI
 
 def _lazy_install():
-    custom_required_packages = ["LibJciHitachi==0.5.2"]
+    custom_required_packages = ["LibJciHitachi==0.5.3"]
     links = "https://qqaatw.github.io/aws-crt-python-musllinux/"
     for pkg in custom_required_packages:
         if not is_installed(pkg) and not install_package(pkg, find_links=links):
@@ -51,6 +51,7 @@ async def async_setup(hass, config):
         config[DOMAIN][CONF_DEVICES] = None
 
     _lazy_install()
+    from JciHitachi import __version__
     from JciHitachi.api import JciHitachiAWSAPI
 
     api = JciHitachiAWSAPI(
@@ -75,8 +76,10 @@ async def async_setup(hass, config):
         _LOGGER.error(f"Failed to login API: {err}")
         return False
 
+    _LOGGER.debug(f"Backend version: {__version__}")
     _LOGGER.debug(
-        f"Thing info: {[thing for thing in api.things.values()]}")
+        f"Thing info: {[thing for thing in api.things.values()]}"
+    )
     
     async def async_update_data():
         """Fetch data from API endpoint.
@@ -140,6 +143,7 @@ async def async_setup_entry(hass, config_entry):
         config[CONF_DEVICES] = None
 
     _lazy_install()
+    from JciHitachi import __version__
     from JciHitachi.api import JciHitachiAWSAPI
 
     api = JciHitachiAWSAPI(
@@ -164,8 +168,10 @@ async def async_setup_entry(hass, config_entry):
         _LOGGER.error(f"Failed to login API: {err}")
         return False
 
+    _LOGGER.debug(f"Backend version: {__version__}")
     _LOGGER.debug(
-        f"Thing info: {[thing for thing in api.things.values()]}")
+        f"Thing info: {[thing for thing in api.things.values()]}"
+    )
     
     async def _async_update_data():
         """Fetch data from API endpoint.
@@ -243,6 +249,7 @@ class JciHitachiEntity(CoordinatorEntity):
             "name": self._thing.name,
             "manufacturer": self._thing.brand,
             "model": self._thing.model,
+            "sw_version": self._thing.firmware_version,
         }
 
     @property
