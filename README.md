@@ -101,7 +101,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
     - Ensure the OS in which your Home Assistant is installed is of the following types: `Windows`, `macOS`, `manylinux`, and `musllinux`, on x86 or ARM platforms. Only 64bit OSes on ARM are supported. Other platforms such as PowerPC and MIPS are not supported.
     - If you still want to run the integration on unsupported platforms, you will need to build(compile) it on your own.
 2. When auto mode is set, the target temperature indicates `65535` or some huge number.
-    - It is normal. Technically, because the target temperature changes automatically under auto mode, the value is set 2-complement `-1` in 16 bit data type by Hitachi cloud.
+    - It is normal. Technically, because the target temperature is not intended to be adjusted by users and changes automatically under auto mode, the value is set 2-complement `-1` in 16 bit data type by the Hitachi cloud.
 
 ## Known issues
 
