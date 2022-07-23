@@ -98,7 +98,8 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 ## Frequently asked questions
 
 1. I cannot install the integration, the log indicates `Requirements for jcihitachi_tw not found: ['LibJciHitachi==x.x.x']`, where x is an arbitrary version number.
-    - Ensure your the OS in which your Home Assistant is installed is of the following types: `Windows`, `macOS`, `manylinux`, and `musllinux`. Only 64 bit OSes are supported on ARM platforms, e.g. Raspberry PI. Other platforms such as PowerPC and MIPS are not supported.
+    - Ensure the OS in which your Home Assistant is installed is of the following types: `Windows`, `macOS`, `manylinux`, and `musllinux`, on x86 or ARM platforms. Only 64bit OSes on ARM are supported. Other platforms such as PowerPC and MIPS are not supported.
+    - If you still want to run the integration on unsupported platforms, you will need to build(compile) it on your own.
 2. When auto mode is set, the target temperature indicates `65535` or some huge number.
     - It is normal. Technically, because the target temperature changes automatically under auto mode, the value is set 2-complement `-1` in 16 bit data type by Hitachi cloud.
 
