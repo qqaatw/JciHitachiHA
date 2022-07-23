@@ -193,7 +193,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
             if status.air_speed == "auto":
                 return FAN_AUTO
             elif status.air_speed == "silent":
-                return FAN_LOW
+                return FAN_SILENT
             elif status.air_speed == "low":
                 return FAN_LOW
             elif status.air_speed == "moderate":
@@ -201,9 +201,9 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
             elif status.air_speed == "high":
                 return FAN_HIGH
             elif status.air_speed == "rapid":
-                return FAN_HIGH
+                return FAN_RAPID
             elif status.air_speed == "express":
-                return FAN_HIGH
+                return FAN_EXPRESS
         _LOGGER.error("Missing fan_mode.")
         return None
     
@@ -309,12 +309,18 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
         if fan_mode == FAN_AUTO:
             self.put_queue(status_name="air_speed", status_str_value="auto")
-        elif fan_mode == FAN_LOW:
+        elif fan_mode == FAN_SILENT:
             self.put_queue(status_name="air_speed", status_str_value="silent")
+        elif fan_mode == FAN_LOW:
+            self.put_queue(status_name="air_speed", status_str_value="low")
         elif fan_mode == FAN_MEDIUM:
             self.put_queue(status_name="air_speed", status_str_value="moderate")
         elif fan_mode == FAN_HIGH:
             self.put_queue(status_name="air_speed", status_str_value="high")
+        elif fan_mode == FAN_RAPID:
+            self.put_queue(status_name="air_speed", status_str_value="rapid")
+        elif fan_mode == FAN_EXPRESS:
+            self.put_queue(status_name="air_speed", status_str_value="express")
         else:
             _LOGGER.error("Invalid fan_mode.")
         self.update()
