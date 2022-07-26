@@ -9,7 +9,7 @@ from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-ORDERED_NAMED_FAN_SPEEDS = ["silent", "low", "moderate", "high"]
+ORDERED_NAMED_FAN_SPEEDS = ["silent", "low", "moderate", "high"]  # TODO: Add auto
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):

@@ -55,13 +55,6 @@ SUPPORT_HVAC = [
     HVAC_MODE_AUTO,
     HVAC_MODE_HEAT,
 ]
-SUPPORT_PRESET = [
-    PRESET_NONE,
-    PRESET_BOOST,
-    PRESET_ECO,
-    PRESET_MOLD_PREVENTION,
-    PRESET_ECO_MOLD_PREVENTION
-]
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -97,6 +90,9 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         super().__init__(thing, coordinator)
         self._supported_features = self.calculate_supported_features()
         self._supported_fan_modes = [fan_mode for i, fan_mode in enumerate(SUPPORT_FAN) if 2 ** i & self._thing.support_code.FanSpeed != 0]
+        self._supported_hvac = [SUPPORT_HVAC[0]] + [hvac for i, hvac in enumerate(SUPPORT_HVAC[1:]) if 2 ** i & self._thing.support_code.Mode != 0]
+        self._supported_presets = self.calculate_supported_presets()
+
 
     @property
     def supported_features(self):
@@ -163,7 +159,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
     @property
     def hvac_modes(self):
-        return SUPPORT_HVAC
+        return self._supported_hvac
     
     @property
     def preset_mode(self):
@@ -184,7 +180,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
     @property
     def preset_modes(self):
-        return SUPPORT_PRESET
+        return self._supported_presets
 
     @property
     def fan_mode(self):
@@ -241,6 +237,21 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
                 self._thing.support_code.VerticalWindDirectionSwitch != "unsupported":
             support_flags |= SUPPORT_SWING_MODE
         return support_flags
+    
+    def calculate_supported_presets(self):
+        supported_presets = [PRESET_NONE]
+        if self._thing.support_code.PowerSaving != "unsupported" and \
+            self._thing.support_code.PowerSaving & 3 == 3:
+            supported_presets.append(PRESET_ECO)
+        if self._thing.support_code.MildewProof != "unsupported" and \
+            self._thing.support_code.MildewProof & 3 == 3:
+            supported_presets.append(PRESET_MOLD_PREVENTION)
+        if len(supported_presets) == 3:
+            supported_presets.append(PRESET_ECO_MOLD_PREVENTION)
+        if self._thing.support_code.QuickMode != "unsupported" and \
+            self._thing.support_code.QuickMode & 3 == 3:
+            supported_presets.append(PRESET_BOOST)
+        return supported_presets
 
     def turn_on(self):
         """Turn the device on."""

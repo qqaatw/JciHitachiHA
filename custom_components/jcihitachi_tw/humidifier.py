@@ -21,10 +21,12 @@ MODE_ECO_COMFORT = "Eco Comfort"
 AVAILABLE_MODES = [
     MODE_AUTO,
     MODE_CUSTOM,
-    #MODE_CONTINUOUS, # not existing in Hitachi app interface
+    MODE_CONTINUOUS,
     MODE_CLOTHES_DRY,
     MODE_AIR_PURIFY,
     MODE_MOLD_PREV,
+    "unsupported",
+    "unsupported",
     MODE_LOW_HUMIDITY,
     MODE_ECO_COMFORT
 ]
@@ -72,12 +74,13 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     def __init__(self, thing, coordinator, supported_features):
         super().__init__(thing, coordinator)
         self._supported_features = supported_features
-    
+        self._available_modes = [mode for i, mode in enumerate(AVAILABLE_MODES) if 2 ** i & self._thing.support_code.Mode != 0]
+
     @property
     def supported_features(self):
         """Return the list of supported features."""
         return self._supported_features
-    
+
     @property
     def target_humidity(self):
         """Return the current temperature."""
@@ -85,19 +88,19 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         if status:
             return status.target_humidity
         return None
-    
+
     @property
     def max_humidity(self):
         """Return the maximum humidity."""
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         return status.max_humidity
-    
+
     @property
     def min_humidity(self):
         """Return the minimum humidity."""
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         return status.min_humidity
-    
+
     @property
     def mode(self):
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
@@ -124,7 +127,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
 
     @property
     def available_modes(self):
-        return AVAILABLE_MODES
+        return self._available_modes
 
     @property
     def is_on(self):
@@ -137,11 +140,11 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         
         _LOGGER.error("Missing is_on.")
         return None
-    
+
     @property
     def device_class(self):
         return DEVICE_CLASS_DEHUMIDIFIER
-    
+
     @property
     def unique_id(self):
         return f"{self._thing.gateway_mac_address}_dehumidifier"
@@ -175,7 +178,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         else:
             _LOGGER.error("Invalid mode.")
         self.update()
-    
+
     def set_humidity(self, humidity):
         """Set new target humidity."""
 
@@ -184,17 +187,15 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
 
         self.put_queue(status_name="target_humidity", status_value=target_humidity)
         self.update()
-    
+
     def turn_on(self, **kwargs):
         """Turn the device on."""
         _LOGGER.debug(f"Turn {self.name} on")
         self.put_queue(status_name="power", status_str_value="on")
         self.update()
-    
+
     def turn_off(self, **kwargs):
         """Turn the device off."""
         _LOGGER.debug(f"Turn {self.name} off")
         self.put_queue(status_name="power", status_str_value="off")
         self.update()
-
-    
