@@ -32,9 +32,7 @@ AVAILABLE_MODES = [
 ]
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up the humidifier platform."""
-
+async def _async_setup(hass, async_add):
     api = hass.data[DOMAIN][API]
     coordinator = hass.data[DOMAIN][COORDINATOR]
 
@@ -44,30 +42,19 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             supported_features = JciHitachiDehumidifierEntity.calculate_supported_features(
                 status
             )
-            async_add_entities(
+            async_add(
                 [JciHitachiDehumidifierEntity(
                     thing, coordinator, supported_features)],
                 update_before_add=True
             )
 
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """Set up the humidifier platform."""
+    _async_setup(hass, async_add_entities)
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the humidifier platform from a config entry."""
-
-    api = hass.data[DOMAIN][API]
-    coordinator = hass.data[DOMAIN][COORDINATOR]
-
-    for thing in api.things.values():
-        if thing.type == "DH":
-            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
-            supported_features = JciHitachiDehumidifierEntity.calculate_supported_features(
-                status
-            )
-            async_add_devices(
-                [JciHitachiDehumidifierEntity(
-                    thing, coordinator, supported_features)],
-                update_before_add=True
-            )
+    _async_setup(hass, async_add_devices)
 
 
 class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):

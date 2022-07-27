@@ -8,36 +8,26 @@ from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up the switch platform."""
-
+async def _async_setup(hass, async_add):
     api = hass.data[DOMAIN][API]
     coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "DH":
-            async_add_entities(
+            async_add(
                 [JciHitachiAirCleaningFilterEntity(thing, coordinator),
                  JciHitachiCleanFilterNotifySwitchEntity(thing, coordinator),
                  JciHitachiMoldPrevSwitchEntity(thing, coordinator),
                  JciHitachiWindSwingableSwitchEntity(thing, coordinator)],
                 update_before_add=True)
 
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """Set up the switch platform."""
+    _async_setup(hass, async_add_entities)
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the switch platform from a config entry."""
-
-    api = hass.data[DOMAIN][API]
-    coordinator = hass.data[DOMAIN][COORDINATOR]
-
-    for thing in api.things.values():
-        if thing.type == "DH":
-            async_add_devices(
-                [JciHitachiAirCleaningFilterEntity(thing, coordinator),
-                 JciHitachiCleanFilterNotifySwitchEntity(thing, coordinator),
-                 JciHitachiMoldPrevSwitchEntity(thing, coordinator),
-                 JciHitachiWindSwingableSwitchEntity(thing, coordinator)],
-                update_before_add=True)
+    _async_setup(hass, async_add_devices)
 
 
 class JciHitachiAirCleaningFilterEntity(JciHitachiEntity, SwitchEntity):

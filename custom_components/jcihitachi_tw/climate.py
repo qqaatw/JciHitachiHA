@@ -57,32 +57,24 @@ SUPPORT_HVAC = [
 ]
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up the climate platform."""
-
+async def _async_setup(hass, async_add):
     api = hass.data[DOMAIN][API]
     coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "AC":
-            async_add_entities(
+            async_add(
                 [JciHitachiClimateEntity(thing, coordinator)],
                 update_before_add=True
             )
 
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """Set up the climate platform."""
+    _async_setup(hass, async_add_entities)
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the climate platform from a config entry."""
-
-    api = hass.data[DOMAIN][API]
-    coordinator = hass.data[DOMAIN][COORDINATOR]
-
-    for thing in api.things.values():
-        if thing.type == "AC":
-            async_add_devices(
-                [JciHitachiClimateEntity(thing, coordinator)],
-                update_before_add=True
-            )
+    _async_setup(hass, async_add_devices)
 
 
 class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):

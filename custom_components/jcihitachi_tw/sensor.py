@@ -19,22 +19,20 @@ ODOR_LEVEL_MIDDLE = "Middle"
 ODOR_LEVEL_HIGH = "High"
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up the sensor platform."""
-    
+async def _async_setup(hass, async_add):
     api = hass.data[DOMAIN][API]
     coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
         if thing.type == "AC":
-            async_add_entities(
+            async_add(
                 [JciHitachiPowerConsumptionSensorEntity(thing, coordinator),
                  JciHitachiMonthlyPowerConsumptionSensorEntity(thing, coordinator),
                  JciHitachiMonthIndicatorSensorEntity(thing, coordinator),
                  ],
                 update_before_add=True)
         elif thing.type == "DH":
-            async_add_entities(
+            async_add(
                 [JciHitachiIndoorHumiditySensorEntity(thing, coordinator),
                  JciHitachiOdorLevelSensorEntity(thing, coordinator),
                  JciHitachiPM25SensorEntity(thing, coordinator),
@@ -44,29 +42,14 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                  ],
                 update_before_add=True)
 
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """Set up the sensor platform."""
+    _async_setup(hass, async_add_entities)
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the sensor platform from a config entry."""
+    _async_setup(hass, async_add_devices)
 
-    api = hass.data[DOMAIN][API]
-    coordinator = hass.data[DOMAIN][COORDINATOR]
-
-    for thing in api.things.values():
-        if thing.type == "AC":
-            async_add_devices(
-                [JciHitachiPowerConsumptionSensorEntity(thing, coordinator),
-                 JciHitachiMonthlyPowerConsumptionSensorEntity(thing, coordinator),
-                 JciHitachiMonthIndicatorSensorEntity(thing, coordinator),],
-                update_before_add=True)
-        elif thing.type == "DH":
-            async_add_devices(
-                [JciHitachiIndoorHumiditySensorEntity(thing, coordinator),
-                 JciHitachiOdorLevelSensorEntity(thing, coordinator),
-                 JciHitachiPM25SensorEntity(thing, coordinator),
-                 JciHitachiPowerConsumptionSensorEntity(thing, coordinator),
-                 JciHitachiMonthlyPowerConsumptionSensorEntity(thing, coordinator),
-                 JciHitachiMonthIndicatorSensorEntity(thing, coordinator),],
-                update_before_add=True)
 
 class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
     def __init__(self, thing, coordinator):
