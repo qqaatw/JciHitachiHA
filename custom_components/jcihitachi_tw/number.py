@@ -38,17 +38,17 @@ class JciHitachiMonthlyDataSelectorNumberEntity(JciHitachiEntity, NumberEntity):
         return f"{self._thing.name} Month Selector"
     
     @property
-    def value(self):
+    def native_value(self):
         """Return the value of the entity."""
         return self._value
 
     @property
-    def min_value(self):
+    def native_min_value(self):
         """Return the minimum month."""
         return 0
 
     @property
-    def max_value(self):
+    def native_max_value(self):
         """Return the maximum month."""
         return 12
 
@@ -56,7 +56,7 @@ class JciHitachiMonthlyDataSelectorNumberEntity(JciHitachiEntity, NumberEntity):
     def unique_id(self):
         return f"{self._thing.gateway_mac_address}_monthly_data_selector_number"
 
-    def set_value(self, value):
+    def set_native_value(self, value):
         """Set new month."""
         _LOGGER.debug(f"Set {self.name} value to {value}")
         self._value = value
