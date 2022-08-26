@@ -23,11 +23,11 @@ async def _async_setup(hass, async_add):
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the switch platform."""
-    _async_setup(hass, async_add_entities)
+    await _async_setup(hass, async_add_entities)
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the switch platform from a config entry."""
-    _async_setup(hass, async_add_devices)
+    await _async_setup(hass, async_add_devices)
 
 
 class JciHitachiAirCleaningFilterEntity(JciHitachiEntity, SwitchEntity):

@@ -18,28 +18,21 @@ async def _async_setup(hass, async_add):
 
     for thing in api.things.values():
         if thing.type == "DH":
-            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
-            supported_features = JciHitachiDehumidifierFanEntity.calculate_supported_features(
-                status
-            )
-            async_add(
-                [JciHitachiDehumidifierFanEntity(
-                    thing, coordinator, supported_features)],
-                update_before_add=True)
+            async_add([JciHitachiDehumidifierFanEntity(thing, coordinator)], update_before_add=True)
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the fan platform."""
-    _async_setup(hass, async_add_entities)
+    await _async_setup(hass, async_add_entities)
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the fan platform from a config entry."""
-    _async_setup(hass, async_add_devices)
+    await _async_setup(hass, async_add_devices)
 
 
 class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
-    def __init__(self, thing, coordinator, supported_features):
+    def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-        self._supported_features = supported_features
+        self._supported_features = self.calculate_supported_features()
 
     @property
     def name(self):
