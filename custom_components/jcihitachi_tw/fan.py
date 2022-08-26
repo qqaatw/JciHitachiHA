@@ -1,7 +1,7 @@
 """JciHitachi integration."""
 import logging
 
-from homeassistant.components.fan import SUPPORT_SET_SPEED, FanEntity
+from homeassistant.components.fan import SUPPORT_SET_SPEED, SUPPORT_PRESET_MODE, FanEntity
 from homeassistant.util.percentage import (ordered_list_item_to_percentage,
                                            percentage_to_ordered_list_item)
 
@@ -9,8 +9,8 @@ from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-ORDERED_NAMED_FAN_SPEEDS = ["silent", "low", "moderate", "high"]  # TODO: Add auto
-
+ORDERED_NAMED_FAN_SPEEDS = ["silent", "low", "moderate", "high"]
+PRESET_MODES = ["auto"]
 
 async def _async_setup(hass, async_add):
     api = hass.data[DOMAIN][API]
@@ -76,12 +76,31 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
         return len(ORDERED_NAMED_FAN_SPEEDS)
 
     @property
+    def preset_mode(self):
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        if status:
+            if status.air_speed == "auto":
+                return "auto"
+            return None
+        
+        _LOGGER.error("Missing preset_mode.")
+        return None
+
+    @property
+    def preset_modes(self):
+        return PRESET_MODES
+
+    @property
     def unique_id(self):
         return f"{self._thing.gateway_mac_address}_dehumidifier_air_speed"
 
-    @staticmethod
-    def calculate_supported_features(status):
-        support_flags = SUPPORT_SET_SPEED
+    def calculate_supported_features(self):
+        support_flags = 0
+        if self._thing.support_code.FanSpeed != "unsupported":
+            support_flags |= SUPPORT_SET_SPEED
+        if self._thing.support_code.FanSpeed & 1 == 1:  # auto mode is at the first bit.
+            support_flags |= SUPPORT_PRESET_MODE
+
         return support_flags
     
     def set_percentage(self, percentage):
@@ -101,6 +120,13 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
             self.put_queue(status_name="air_speed", status_str_value="high")
         else:
             _LOGGER.error("Invalid air_speed.")
+        
+        self.update()
+    
+    def set_preset_mode(self, preset_mode):
+        """Set the preset mode of the fan."""
+        _LOGGER.debug(f"Set {self.name} preset mode to {preset_mode}")
+        self.put_queue(status_name="air_speed", status_str_value="auto")
         self.update()
 
     def turn_on(self, **kwargs):
