@@ -60,7 +60,16 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - ~~Sound control 聲音控制~~ (Only supported by LibJciHitachi)
   - ~~Display brightness 顯示器亮度~~ (Only supported by LibJciHitachi)
   - ~~Side vent 側吹~~ (Only supported by LibJciHitachi)
-- ~~Hitachi HeatExchanger 日立全熱交換機~~ (Under development)
+- Hitachi Heat Exchanger 日立全熱交換機
+  - Power 電源
+  - Breath mode 換氣模式
+  - Air speed 風速
+  - Indoor temperature 室內溫度
+  - ~~Mode 運轉模式~~ (Only supported by LibJciHitachi)
+  - ~~Error code 錯誤代碼~~ (Only supported by LibJciHitachi)
+  - ~~Air cleaning filter notification 空氣清淨濾網清潔通知~~ (Only supported by LibJciHitachi)
+  - ~~Front filter notification 前置濾網清潔通知~~ (Only supported by LibJciHitachi)
+  - ~~PM25 filter notification PM25濾網清潔通知~~ (Only supported by LibJciHitachi)
 
 ## Tested devices
 
@@ -94,6 +103,10 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 - RD-200HH
 - RDI-640HH
 - RDI-360DX
+
+### Heat exchanger
+
+- KPI-H
 
 ## Frequently asked questions
 

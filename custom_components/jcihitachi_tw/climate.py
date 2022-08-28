@@ -85,7 +85,6 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         self._supported_hvac = [SUPPORT_HVAC[0]] + [hvac for i, hvac in enumerate(SUPPORT_HVAC[1:]) if 2 ** i & self._thing.support_code.Mode != 0]
         self._supported_presets = self.calculate_supported_presets()
 
-
     @property
     def supported_features(self):
         """Return the list of supported features."""

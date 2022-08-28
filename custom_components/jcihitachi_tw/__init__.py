@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from JciHitachi.api import JciHitachiAWSAPI
 
 def _lazy_install():
-    custom_required_packages = ["LibJciHitachi==0.5.3"]
+    custom_required_packages = ["LibJciHitachi==1.0.0"]
     links = "https://qqaatw.github.io/aws-crt-python-musllinux/"
     for pkg in custom_required_packages:
         if not is_installed(pkg) and not install_package(pkg, find_links=links):

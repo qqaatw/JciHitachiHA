@@ -8,7 +8,9 @@ from homeassistant.components.sensor import (STATE_CLASS_MEASUREMENT,
 from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
                                  DEVICE_CLASS_DATE, DEVICE_CLASS_ENERGY,
                                  DEVICE_CLASS_HUMIDITY, DEVICE_CLASS_PM25,
-                                 ENERGY_KILO_WATT_HOUR, PERCENTAGE)
+                                 DEVICE_CLASS_TEMPERATURE,
+                                 ENERGY_KILO_WATT_HOUR, PERCENTAGE,
+                                 TEMP_CELSIUS)
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
@@ -41,6 +43,12 @@ async def _async_setup(hass, async_add):
                  JciHitachiMonthIndicatorSensorEntity(thing, coordinator),
                  ],
                 update_before_add=True)
+        elif thing.type == "HE":
+            async_add(
+                [JciHitachiIndoorTemperatureSensorEntity(thing, coordinator),
+                 ], 
+                 update_before_add=True
+            )
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
@@ -245,3 +253,35 @@ class JciHitachiMonthIndicatorSensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def unique_id(self):
         return f"{self._thing.gateway_mac_address}_month_indicator_sensor"
+
+
+class JciHitachiIndoorTemperatureSensorEntity(JciHitachiEntity, SensorEntity):
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
+
+    @property
+    def name(self):
+        """Return the name of the entity."""
+        return f"{self._thing.name} Indoor Temperature"
+
+    @property
+    def state(self):
+        """Return the indoor temperature."""
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status:
+            return status.IndoorTemperature
+        return None
+
+    @property
+    def device_class(self):
+        """Return the device class."""
+        return DEVICE_CLASS_TEMPERATURE
+
+    @property
+    def unit_of_measurement(self):
+        """Return the unit of measurement."""
+        return TEMP_CELSIUS
+
+    @property
+    def unique_id(self):
+        return f"{self._thing.gateway_mac_address}_indoor_temperature_sensor"
