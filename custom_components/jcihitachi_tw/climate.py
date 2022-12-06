@@ -84,6 +84,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         self._supported_fan_modes = [fan_mode for i, fan_mode in enumerate(SUPPORT_FAN) if 2 ** i & self._thing.support_code.FanSpeed != 0]
         self._supported_hvac = [SUPPORT_HVAC[0]] + [hvac for i, hvac in enumerate(SUPPORT_HVAC[1:]) if 2 ** i & self._thing.support_code.Mode != 0]
         self._supported_presets = self.calculate_supported_presets()
+        self._prev_target = -1
 
     @property
     def supported_features(self):
@@ -108,6 +109,21 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         """Return the target temperature."""
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
+            # keep old data
+            if status.mode == "fan":
+                if self._prev_target == -1:
+                    self._prev_target = status.min_temp
+                _LOGGER.debug(f"fan mode no target temp, set to previous value: {self._prev_target}")
+                return self._prev_target
+            elif status.mode == "auto":
+                if self._prev_target == -1:
+                    self._prev_target = status.min_temp
+                _LOGGER.debug(f"auto mode no target temp, set to previous value: {self._prev_target}")
+                return self._prev_target
+            else:
+                self._prev_target = status.target_temp
+                _LOGGER.debug(f"store target temp in normal mode: {self._prev_target}")
+
             return status.target_temp
         return None
 
