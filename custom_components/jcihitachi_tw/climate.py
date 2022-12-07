@@ -109,20 +109,19 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         """Return the target temperature."""
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
-            # keep old data
-            if status.mode == "fan":
-                if self._prev_target == -1:
-                    self._prev_target = status.min_temp
-                _LOGGER.debug(f"fan mode no target temp, set to previous value: {self._prev_target}")
-                return self._prev_target
-            elif status.mode == "auto":
-                if self._prev_target == -1:
-                    self._prev_target = status.min_temp
-                _LOGGER.debug(f"auto mode no target temp, set to previous value: {self._prev_target}")
-                return self._prev_target
+            if status.target_temp == 65535:
+                if status.mode == "fan":
+                    if self._prev_target == -1:
+                        self._prev_target = status.min_temp
+                    _LOGGER.debug(f"no target temp defined in fan mode, returning previous target: {self._prev_target}")
+                    return self._prev_target
+                elif status.mode == "auto":
+                    if self._prev_target == -1:
+                        self._prev_target = status.min_temp
+                    _LOGGER.debug(f"no target temp defined in auto mode, returning previous target: {self._prev_target}")
+                    return self._prev_target
             else:
                 self._prev_target = status.target_temp
-                _LOGGER.debug(f"store target temp in normal mode: {self._prev_target}")
 
             return status.target_temp
         return None
