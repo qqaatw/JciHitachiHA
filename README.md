@@ -115,8 +115,8 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
     - If you still want to run the integration on unsupported platforms, you will need to build(compile) it on your own.
 2. When auto mode or fan mode is set, the target temperature stays at the target set in cool/dry/heat mode.
     - If this entity didn't get a valid target temperature before, the target temperature will indicate the minimum temperature.
-    - Technically, because the target temperature is not intended to be adjusted by users and changes automatically under auto mode or fan mode, the value is set 2-complement `-1` in 16 bit data type (a.k.a. `65535`) by the Hitachi cloud. We had modified the displayed value to avoid the Home Assistant history plot scales to `65535`.
-    - If it still showing huge number, please refer to PR #36, you may add extra edge condition by yourself.
+    - Technically, because the target temperature is not intended to be adjusted by users and changes automatically under auto mode or fan mode, the value is set 2-complement `-1` in 16 bit data type (a.k.a. `65535`) by the Hitachi cloud. We have modified the displayed value to avoid the Home Assistant history plot scales to `65535`.
+    - If it is still showing a huge number, please refer to PR #36, you may add extra edge conditions by yourself.
 
 ## Known issues
 
