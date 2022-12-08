@@ -113,8 +113,10 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 1. I cannot install the integration, the log indicates `Requirements for jcihitachi_tw not found: ['LibJciHitachi==x.x.x']`, where x is an arbitrary version number.
     - Ensure the OS in which your Home Assistant is installed is of the following types: `Windows`, `macOS`, `manylinux`, and `musllinux`, on x86 or ARM platforms. Only 64bit OSes on ARM are supported. Other platforms such as PowerPC and MIPS are not supported.
     - If you still want to run the integration on unsupported platforms, you will need to build(compile) it on your own.
-2. When auto mode is set, the target temperature indicates `65535` or some huge number.
-    - It is normal. Technically, because the target temperature is not intended to be adjusted by users and changes automatically under auto mode, the value is set 2-complement `-1` in 16 bit data type by the Hitachi cloud.
+2. When auto mode or fan mode is set, the target temperature stays at the target set in cool/dry/heat mode.
+    - If this entity didn't get a valid target temperature before, the target temperature will indicate the minimum temperature.
+    - Technically, because the target temperature is not intended to be adjusted by users and changes automatically under auto mode or fan mode, the value is set 2-complement `-1` in 16 bit data type (a.k.a. `65535`) by the Hitachi cloud. We have modified the displayed value to avoid the Home Assistant history plot scales to `65535`.
+    - If it is still showing a huge number, please refer to PR #36, you may add extra edge conditions by yourself.
 
 ## Known issues
 
