@@ -33,6 +33,44 @@ def _lazy_install():
         if not is_installed(pkg) and not install_package(pkg, find_links=links):
             raise RequirementsNotFound(DOMAIN, [pkg])
 
+def build_coordinator(hass, api):
+
+    timeout = BASE_TIMEOUT + len(api.things) * 2
+
+    async def async_update_data():
+        """Fetch data from API endpoint.
+
+        This is the place to pre-process the data to lookup tables
+        so entities can quickly look up their data.
+        """
+        try:
+            # Note: asyncio.TimeoutError and aiohttp.ClientError are already
+            # handled by the data update coordinator.
+            async with async_timeout.timeout(timeout):
+                await hass.async_add_executor_job(api.refresh_status)
+                hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
+
+        except asyncio.TimeoutError as err:
+            raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
+
+        except Exception as err:
+            raise UpdateFailed(f"Error communicating with API: {err}")
+        
+        _LOGGER.debug(
+            f"Latest data: {[(name, value.status) for name, value in hass.data[DOMAIN][UPDATED_DATA].items()]}")
+
+    coordinator = DataUpdateCoordinator(
+        hass,
+        _LOGGER,
+        # Name of the data. For logging purposes.
+        name=DOMAIN,
+        update_method=async_update_data,
+        # Polling interval. Will only be polled if there are subscribers.
+        update_interval=DATA_UPDATE_INTERVAL,
+    )
+
+    return coordinator
+
 async def async_setup(hass, config):
     """Set up from the configuration.yaml"""
     if config.get(DOMAIN, None) is None:
@@ -61,12 +99,6 @@ async def async_setup(hass, config):
         max_retries=config[DOMAIN].get(CONF_RETRY),
     )
 
-    hass.data[DOMAIN] = {}
-    hass.data[DOMAIN][API] = api
-    hass.data[DOMAIN][UPDATE_DATA] = Queue()
-    hass.data[DOMAIN][UPDATED_DATA] = dict()
-    hass.data[DOMAIN][COORDINATOR] = None
-
     try:
         await hass.async_add_executor_job(api.login)
     except AssertionError as err:
@@ -77,51 +109,19 @@ async def async_setup(hass, config):
         return False
 
     _LOGGER.debug(f"Backend version: {__version__}")
-    _LOGGER.debug(
-        f"Thing info: {[thing for thing in api.things.values()]}"
-    )
-    
-    async def async_update_data():
-        """Fetch data from API endpoint.
+    _LOGGER.debug(f"Thing info: {[thing for thing in api.things.values()]}")
 
-        This is the place to pre-process the data to lookup tables
-        so entities can quickly look up their data.
-        """
-        try:
-            # Note: asyncio.TimeoutError and aiohttp.ClientError are already
-            # handled by the data update coordinator.
-            async with async_timeout.timeout(BASE_TIMEOUT + len(api.things) * 2):
-                await hass.async_add_executor_job(api.refresh_status)
-                hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
-
-        except asyncio.TimeoutError as err:
-            raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
-
-        except Exception as err:
-            raise UpdateFailed(f"Error communicating with API: {err}")
-        
-        _LOGGER.debug(
-            f"Latest data: {[(name, value.status) for name, value in hass.data[DOMAIN][UPDATED_DATA].items()]}")
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        # Name of the data. For logging purposes.
-        name=DOMAIN,
-        update_method=async_update_data,
-        # Polling interval. Will only be polled if there are subscribers.
-        update_interval=DATA_UPDATE_INTERVAL,
-    )
-
-    await coordinator.async_refresh()
-
-    hass.data[DOMAIN][COORDINATOR] = coordinator
+    hass.data[DOMAIN] = {}
+    hass.data[DOMAIN][API] = api
+    hass.data[DOMAIN][UPDATE_DATA] = Queue()
+    hass.data[DOMAIN][UPDATED_DATA] = dict()
+    hass.data[DOMAIN][COORDINATOR] = build_coordinator(hass, api)
+    await hass.data[DOMAIN][COORDINATOR].async_refresh()
     
     # Start jcihitachi components
-    if hass.data[DOMAIN][API]:
-        _LOGGER.debug("Starting JciHitachi components.")
-        for platform in PLATFORMS:
-            discovery.load_platform(hass, platform, DOMAIN, {}, config)
+    _LOGGER.debug("Starting JciHitachi components.")
+    for platform in PLATFORMS:
+        discovery.load_platform(hass, platform, DOMAIN, {}, config)
 
     # Return boolean to indicate that initialization was successful.
     return True
@@ -153,12 +153,6 @@ async def async_setup_entry(hass, config_entry):
         max_retries=config.get(CONF_RETRY),
     )
 
-    hass.data[DOMAIN] = {}
-    hass.data[DOMAIN][API] = api
-    hass.data[DOMAIN][UPDATE_DATA] = Queue()
-    hass.data[DOMAIN][UPDATED_DATA] = dict()
-    hass.data[DOMAIN][COORDINATOR] = None
-
     try:
         await hass.async_add_executor_job(api.login)
     except AssertionError as err:
@@ -169,56 +163,21 @@ async def async_setup_entry(hass, config_entry):
         return False
 
     _LOGGER.debug(f"Backend version: {__version__}")
-    _LOGGER.debug(
-        f"Thing info: {[thing for thing in api.things.values()]}"
-    )
-    
-    async def _async_update_data():
-        """Fetch data from API endpoint.
+    _LOGGER.debug(f"Thing info: {[thing for thing in api.things.values()]}")
 
-        This is the place to pre-process the data to lookup tables
-        so entities can quickly look up their data.
-        """
-        try:
-            # Note: asyncio.TimeoutError and aiohttp.ClientError are already
-            # handled by the data update coordinator.
-            async with async_timeout.timeout(BASE_TIMEOUT + len(api.things) * 2):
-                await hass.async_add_executor_job(api.refresh_status)
-                hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
-
-        except asyncio.TimeoutError as err:
-            raise UpdateFailed(f"Command executed timed out when regularly fetching data.")
-
-        except Exception as err:
-            raise UpdateFailed(f"Error communicating with API: {err}")
-
-        _LOGGER.debug(
-            f"Latest data: {[(name, value.status) for name, value in hass.data[DOMAIN][UPDATED_DATA].items()]}")
-
-    def _async_forward_entry_setup():
-        for platform in PLATFORMS:
-            hass.async_create_task(
-                hass.config_entries.async_forward_entry_setup(config_entry, platform)
-            )
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        # Name of the data. For logging purposes.
-        name=DOMAIN,
-        update_method=_async_update_data,
-        # Polling interval. Will only be polled if there are subscribers.
-        update_interval=DATA_UPDATE_INTERVAL,
-    )
-
-    await coordinator.async_refresh()
-
-    hass.data[DOMAIN][COORDINATOR] = coordinator
+    hass.data[DOMAIN] = {}
+    hass.data[DOMAIN][API] = api
+    hass.data[DOMAIN][UPDATE_DATA] = Queue()
+    hass.data[DOMAIN][UPDATED_DATA] = dict()
+    hass.data[DOMAIN][COORDINATOR] = build_coordinator(hass, api)
+    await hass.data[DOMAIN][COORDINATOR].async_refresh()
     
     # Start jcihitachi components
-    if hass.data[DOMAIN][API]:
-        _LOGGER.debug("Starting JciHitachi components.")
-        _async_forward_entry_setup()
+    _LOGGER.debug("Starting JciHitachi components.")
+    for platform in PLATFORMS:
+        hass.async_create_task(
+            hass.config_entries.async_forward_entry_setup(config_entry, platform)
+        )
     
     # Return boolean to indicate that initialization was successful.
     return True
