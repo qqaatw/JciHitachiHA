@@ -112,7 +112,8 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 ## Frequently asked questions
 
-1. If the system status badge on the top is green, the Hitachi cloud worked normally at the nightly check. Please do not open an issue asking the usability of the integration.
+1. Is the integration usable (does the Hitachi cloud works) ? 
+   - If the system status badge on the top is green, the Hitachi cloud worked normally at the last nightly check. Please do not open an issue asking the usability of the integration.
 2. I cannot install the integration, the log indicates `Requirements for jcihitachi_tw not found: ['LibJciHitachi==x.x.x']`, where x is an arbitrary version number.
     - Ensure the OS in which your Home Assistant is installed is of the following types: `Windows`, `macOS`, `manylinux`, and `musllinux`, on x86 or ARM platforms. Only 64bit OSes on ARM are supported. Other platforms such as PowerPC and MIPS are not supported.
     - If you still want to run the integration on unsupported platforms, you will need to build(compile) it on your own.
