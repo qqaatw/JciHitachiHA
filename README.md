@@ -1,5 +1,7 @@
 # Jci-Hitachi Home Assistant Integration
 
+[![System Status](https://github.com/qqaatw/LibJciHitachi/actions/workflows/Status.yml/badge.svg)](https://github.com/qqaatw/LibJciHitachi/actions/workflows/Status.yml)
+
 ## Feature
 A home assistant integration for controlling Jci Hitachi devices, using [LibJciHitachi](https://github.com/qqaatw/LibJciHitachi) backend.
 
@@ -110,10 +112,11 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 
 ## Frequently asked questions
 
-1. I cannot install the integration, the log indicates `Requirements for jcihitachi_tw not found: ['LibJciHitachi==x.x.x']`, where x is an arbitrary version number.
+1. If the system status badge on the top is green, the Hitachi cloud worked normally at the nightly check. Please do not open an issue asking the usability of the integration.
+2. I cannot install the integration, the log indicates `Requirements for jcihitachi_tw not found: ['LibJciHitachi==x.x.x']`, where x is an arbitrary version number.
     - Ensure the OS in which your Home Assistant is installed is of the following types: `Windows`, `macOS`, `manylinux`, and `musllinux`, on x86 or ARM platforms. Only 64bit OSes on ARM are supported. Other platforms such as PowerPC and MIPS are not supported.
     - If you still want to run the integration on unsupported platforms, you will need to build(compile) it on your own.
-2. When auto mode or fan mode is set, the target temperature stays at the target set in cool/dry/heat mode.
+3. When auto mode or fan mode is set, the target temperature stays at the target set in cool/dry/heat mode.
     - If this entity didn't get a valid target temperature before, the target temperature will indicate the minimum temperature.
     - Technically, because the target temperature is not intended to be adjusted by users and changes automatically under auto mode or fan mode, the value is set 2-complement `-1` in 16 bit data type (a.k.a. `65535`) by the Hitachi cloud. We have modified the displayed value to avoid the Home Assistant history plot scales to `65535`.
     - If it is still showing a huge number, please refer to PR #36, you may add extra edge conditions by yourself.
