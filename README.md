@@ -84,14 +84,18 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - RA-28NV1
 - Single-split and multi-split
   - RAD-90NJF / RAC-90NK1
+  - RAS-81NJF
   - RAS-81NK
   - RAC-63NK
   - RAS-50NJF / RAC-50NK
   - RAS-40NK
+  - RAS-40NT / RAC-40NP
   - RAS-36NJF / RAC-36NK
   - RAS-36NK  / RAC-36NK1
+  - RAS-32NJF
   - RAS-28NJF / RAC-28NK
   - RAS-28NB / RAC-28NB
+  - RAS-22NJF
 - Business
   - RPI-90FK
   - RPI-36FR
