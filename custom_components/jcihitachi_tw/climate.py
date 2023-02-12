@@ -20,7 +20,7 @@ from homeassistant.components.climate.const import (FAN_AUTO, FAN_DIFFUSE,
                                                     SWING_BOTH,
                                                     SWING_HORIZONTAL,
                                                     SWING_OFF, SWING_VERTICAL)
-from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
+from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
@@ -94,7 +94,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     @property
     def temperature_unit(self):
         """Return the unit of measurement."""
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     @property
     def current_temperature(self):

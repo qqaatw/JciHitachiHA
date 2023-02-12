@@ -4,13 +4,10 @@ import logging
 
 from homeassistant.components.sensor import (STATE_CLASS_MEASUREMENT,
                                              STATE_CLASS_TOTAL_INCREASING,
+                                             SensorDeviceClass,
                                              SensorEntity)
-from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-                                 DEVICE_CLASS_DATE, DEVICE_CLASS_ENERGY,
-                                 DEVICE_CLASS_HUMIDITY, DEVICE_CLASS_PM25,
-                                 DEVICE_CLASS_TEMPERATURE,
-                                 ENERGY_KILO_WATT_HOUR, PERCENTAGE,
-                                 TEMP_CELSIUS)
+from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, PERCENTAGE,
+                                 UnitOfEnergy, UnitOfTemperature)
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
@@ -19,6 +16,11 @@ _LOGGER = logging.getLogger(__name__)
 ODOR_LEVEL_LOW = "Low"
 ODOR_LEVEL_MIDDLE = "Middle"
 ODOR_LEVEL_HIGH = "High"
+ODOR_LEVELS = [
+    ODOR_LEVEL_LOW,
+    ODOR_LEVEL_MIDDLE,
+    ODOR_LEVEL_HIGH,
+]
 
 
 async def _async_setup(hass, async_add):
@@ -69,7 +71,7 @@ class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
         return f"{self._thing.name} Indoor Humidity"
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the indoor humidity."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
@@ -79,10 +81,10 @@ class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def device_class(self):
         """Return the device class."""
-        return DEVICE_CLASS_HUMIDITY
+        return SensorDeviceClass.HUMIDITY
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Return the unit of measurement."""
         return PERCENTAGE
 
@@ -101,7 +103,7 @@ class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
         return f"{self._thing.name} PM2.5"
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the PM2.5 value."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
@@ -111,10 +113,10 @@ class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def device_class(self):
         """Return the device class."""
-        return DEVICE_CLASS_PM25
+        return SensorDeviceClass.PM25
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Return the unit of measurement."""
         return CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
 
@@ -133,7 +135,7 @@ class JciHitachiOdorLevelSensorEntity(JciHitachiEntity, SensorEntity):
         return f"{self._thing.name} Odor Level"
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the odor level."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
@@ -144,6 +146,16 @@ class JciHitachiOdorLevelSensorEntity(JciHitachiEntity, SensorEntity):
             elif status.odor_level == "high":
                 return ODOR_LEVEL_HIGH
         return None
+    
+    @property
+    def options(self):
+        """Return all odor levels."""
+        return ODOR_LEVELS
+    
+    @property
+    def device_class(self):
+        """Return the device class."""
+        return SensorDeviceClass.ENUM
 
     @property
     def unique_id(self):
@@ -160,7 +172,7 @@ class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
         return f"{self._thing.name} Power Consumption"
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the power consumption in KW/H"""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
@@ -170,12 +182,12 @@ class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def device_class(self):
         """Return the device class."""
-        return DEVICE_CLASS_ENERGY
+        return SensorDeviceClass.ENERGY
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Return the unit of measurement."""
-        return ENERGY_KILO_WATT_HOUR
+        return UnitOfEnergy.KILO_WATT_HOUR
 
     @property
     def unique_id(self):
@@ -195,7 +207,7 @@ class JciHitachiMonthlyPowerConsumptionSensorEntity(JciHitachiEntity, SensorEnti
         return f"{self._thing.name} Monthly Power Consumption"
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the monthly power consumption in KW/H"""
         monthly_data = self._thing.monthly_data
         if monthly_data:
@@ -205,12 +217,12 @@ class JciHitachiMonthlyPowerConsumptionSensorEntity(JciHitachiEntity, SensorEnti
     @property
     def device_class(self):
         """Return the device class."""
-        return DEVICE_CLASS_ENERGY
+        return SensorDeviceClass.ENERGY
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Return the unit of measurement."""
-        return ENERGY_KILO_WATT_HOUR
+        return UnitOfEnergy.KILO_WATT_HOUR
 
     @property
     def unique_id(self):
@@ -248,7 +260,7 @@ class JciHitachiMonthIndicatorSensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def device_class(self):
         """Return the device class."""
-        return DEVICE_CLASS_DATE
+        return SensorDeviceClass.DATE
 
     @property
     def unique_id(self):
@@ -265,7 +277,7 @@ class JciHitachiIndoorTemperatureSensorEntity(JciHitachiEntity, SensorEntity):
         return f"{self._thing.name} Indoor Temperature"
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the indoor temperature."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
@@ -275,12 +287,12 @@ class JciHitachiIndoorTemperatureSensorEntity(JciHitachiEntity, SensorEntity):
     @property
     def device_class(self):
         """Return the device class."""
-        return DEVICE_CLASS_TEMPERATURE
+        return SensorDeviceClass.TEMPERATURE
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Return the unit of measurement."""
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     @property
     def unique_id(self):

@@ -1,8 +1,7 @@
 """JciHitachi integration."""
 import logging
 
-from homeassistant.components.binary_sensor import (DEVICE_CLASS_PROBLEM,
-                                                    BinarySensorEntity)
+from homeassistant.components.binary_sensor import (BinarySensorEntity, BinarySensorDeviceClass)
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
@@ -51,7 +50,7 @@ class JciHitachiErrorBinarySensorEntity(JciHitachiEntity, BinarySensorEntity):
 
     @property
     def device_class(self):
-        return DEVICE_CLASS_PROBLEM
+        return BinarySensorDeviceClass.PROBLEM
 
     @property
     def unique_id(self):
@@ -80,7 +79,7 @@ class JciHitachiWaterFullBinarySensorEntity(JciHitachiEntity, BinarySensorEntity
 
     @property
     def device_class(self):
-        return DEVICE_CLASS_PROBLEM
+        return BinarySensorDeviceClass.PROBLEM
     
     @property
     def unique_id(self):

@@ -1,9 +1,7 @@
 """JciHitachi integration."""
 import logging
 
-from homeassistant.components.humidifier import HumidifierEntity
-from homeassistant.components.humidifier.const import (
-    DEVICE_CLASS_DEHUMIDIFIER, SUPPORT_MODES)
+from homeassistant.components.humidifier import HumidifierEntity, HumidifierDeviceClass, SUPPORT_MODES
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
@@ -130,7 +128,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
 
     @property
     def device_class(self):
-        return DEVICE_CLASS_DEHUMIDIFIER
+        return HumidifierDeviceClass.DEHUMIDIFIER
 
     @property
     def unique_id(self):
