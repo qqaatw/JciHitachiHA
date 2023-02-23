@@ -1,11 +1,11 @@
 {
-  "config_flow": true,
   "domain": "jcihitachi_tw",
   "name": "JciHitachi TW",
-  "version": "1.1.0",
+  "codeowners": ["@qqaatw"],
+  "config_flow": true,
   "documentation": "https://github.com/qqaatw/JciHitachiHA",
+  "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/qqaatw/JciHitachiHA/issues",
   "requirements": [],
-  "codeowners": ["@qqaatw"],
-  "iot_class": "cloud_polling"
+  "version": "1.1.0"
 }
