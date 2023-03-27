@@ -114,9 +114,8 @@ async def async_setup(hass, config):
     hass.data[DOMAIN] = {}
     hass.data[DOMAIN][API] = api
     hass.data[DOMAIN][UPDATE_DATA] = Queue()
-    hass.data[DOMAIN][UPDATED_DATA] = dict()
+    hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
     hass.data[DOMAIN][COORDINATOR] = build_coordinator(hass, api)
-    await hass.data[DOMAIN][COORDINATOR].async_refresh()
     
     # Start jcihitachi components
     _LOGGER.debug("Starting JciHitachi components.")
@@ -168,9 +167,8 @@ async def async_setup_entry(hass, config_entry):
     hass.data[DOMAIN] = {}
     hass.data[DOMAIN][API] = api
     hass.data[DOMAIN][UPDATE_DATA] = Queue()
-    hass.data[DOMAIN][UPDATED_DATA] = dict()
+    hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
     hass.data[DOMAIN][COORDINATOR] = build_coordinator(hass, api)
-    await hass.data[DOMAIN][COORDINATOR].async_refresh()
     
     # Start jcihitachi components
     _LOGGER.debug("Starting JciHitachi components.")
