@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from JciHitachi.api import JciHitachiAWSAPI
 
 def _lazy_install():
-    custom_required_packages = ["LibJciHitachi==1.1.0"]
+    custom_required_packages = ["LibJciHitachi==1.2.0"]
     links = "https://qqaatw.github.io/aws-crt-python-musllinux/"
     for pkg in custom_required_packages:
         if not is_installed(pkg) and not install_package(pkg, find_links=links):
@@ -68,6 +68,10 @@ def build_coordinator(hass, api):
         # Polling interval. Will only be polled if there are subscribers.
         update_interval=DATA_UPDATE_INTERVAL,
     )
+
+    # Reset the update scheduler as the data already exists in
+    # `hass.data[DOMAIN][UPDATED_DATA]`.
+    coordinator.async_set_updated_data(None)
 
     return coordinator
 
@@ -169,7 +173,7 @@ async def async_setup_entry(hass, config_entry):
     hass.data[DOMAIN][UPDATE_DATA] = Queue()
     hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
     hass.data[DOMAIN][COORDINATOR] = build_coordinator(hass, api)
-    
+
     # Start jcihitachi components
     _LOGGER.debug("Starting JciHitachi components.")
     for platform in PLATFORMS:
