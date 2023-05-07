@@ -75,7 +75,7 @@ class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
         """Return the indoor humidity."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
-            return status.indoor_humidity
+            return None if status.indoor_humidity == "unsupported" else status.indoor_humidity
         return None
 
     @property
@@ -176,7 +176,7 @@ class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
         """Return the power consumption in KW/H"""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
-            return status.power_kwh
+            return None if status.power_kwh == "unsupported" else status.power_kwh
         return None
 
     @property
@@ -281,7 +281,7 @@ class JciHitachiIndoorTemperatureSensorEntity(JciHitachiEntity, SensorEntity):
         """Return the indoor temperature."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
-            return status.IndoorTemperature
+            return None if status.IndoorTemperature == "unsupported" else status.IndoorTemperature
         return None
 
     @property
