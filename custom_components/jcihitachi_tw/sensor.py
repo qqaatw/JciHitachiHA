@@ -107,6 +107,8 @@ class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
         """Return the PM2.5 value."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
+            if status.pm25_value == "unsupported":
+                return None
             return status.pm25_value
         return None
 
