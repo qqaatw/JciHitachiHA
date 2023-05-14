@@ -230,7 +230,7 @@ class JciHitachiMonthlyPowerConsumptionSensorEntity(JciHitachiEntity, SensorEnti
     
     @property
     def state_class(self):
-        return STATE_CLASS_MEASUREMENT
+        return None
 
 class JciHitachiMonthIndicatorSensorEntity(JciHitachiEntity, SensorEntity):
     def __init__(self, thing, coordinator):
