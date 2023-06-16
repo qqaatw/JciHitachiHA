@@ -1,7 +1,9 @@
 """JciHitachi integration."""
 import logging
 
-from homeassistant.components.humidifier import HumidifierEntity, HumidifierDeviceClass, SUPPORT_MODES
+from homeassistant.components.humidifier import (SUPPORT_MODES,
+                                                 HumidifierDeviceClass,
+                                                 HumidifierEntity)
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 

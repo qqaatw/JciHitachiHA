@@ -2,12 +2,10 @@
 import datetime
 import logging
 
-from homeassistant.components.sensor import (STATE_CLASS_MEASUREMENT,
-                                             STATE_CLASS_TOTAL_INCREASING,
-                                             SensorDeviceClass,
-                                             SensorEntity)
-from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, PERCENTAGE,
-                                 UnitOfEnergy, UnitOfTemperature)
+from homeassistant.components.sensor import (STATE_CLASS_TOTAL_INCREASING,
+                                             SensorDeviceClass, SensorEntity)
+from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                                 PERCENTAGE, UnitOfEnergy, UnitOfTemperature)
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 

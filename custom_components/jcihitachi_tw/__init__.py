@@ -4,15 +4,15 @@ import logging
 from dataclasses import dataclass, field
 from datetime import timedelta
 from queue import Queue
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import async_timeout
 from homeassistant.helpers import discovery
 from homeassistant.helpers.update_coordinator import (CoordinatorEntity,
                                                       DataUpdateCoordinator,
                                                       UpdateFailed)
-from homeassistant.requirements import RequirementsNotFound
-from homeassistant.util.package import install_package, is_installed
+from JciHitachi import __version__
+from JciHitachi.api import JciHitachiAWSAPI
 
 from .const import (API, CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD, CONF_RETRY,
                     CONFIG_SCHEMA, COORDINATOR, DOMAIN, UPDATE_DATA,
@@ -23,15 +23,6 @@ PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "number", "sensor"
 DATA_UPDATE_INTERVAL = timedelta(seconds=30)
 BASE_TIMEOUT = 5
 
-if TYPE_CHECKING:
-    from JciHitachi.api import JciHitachiAWSAPI
-
-def _lazy_install():
-    custom_required_packages = ["LibJciHitachi==1.2.2"]
-    links = "https://qqaatw.github.io/aws-crt-python-musllinux/"
-    for pkg in custom_required_packages:
-        if not is_installed(pkg) and not install_package(pkg, find_links=links):
-            raise RequirementsNotFound(DOMAIN, [pkg])
 
 def build_coordinator(hass, api):
 
@@ -92,10 +83,6 @@ async def async_setup(hass, config):
     if config[DOMAIN].get(CONF_DEVICES) == []:
         config[DOMAIN][CONF_DEVICES] = None
 
-    _lazy_install()
-    from JciHitachi import __version__
-    from JciHitachi.api import JciHitachiAWSAPI
-
     api = JciHitachiAWSAPI(
         email=config[DOMAIN].get(CONF_EMAIL),
         password=config[DOMAIN].get(CONF_PASSWORD),
@@ -144,10 +131,6 @@ async def async_setup_entry(hass, config_entry):
 
     if config.get(CONF_DEVICES) == []:
         config[CONF_DEVICES] = None
-
-    _lazy_install()
-    from JciHitachi import __version__
-    from JciHitachi.api import JciHitachiAWSAPI
 
     api = JciHitachiAWSAPI(
         email=config.get(CONF_EMAIL),

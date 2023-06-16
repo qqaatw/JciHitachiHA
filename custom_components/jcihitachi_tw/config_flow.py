@@ -1,24 +1,17 @@
 """JciHitachi integration."""
 import logging
-from typing import TYPE_CHECKING
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD
+from JciHitachi.api import JciHitachiAWSAPI
 
-from . import _lazy_install
 from .const import (CONF_ADD_ANOTHER_DEVICE, CONF_RETRY,
                     CONFIG_FLOW_ADD_DEVICE_SCHEMA, CONFIG_FLOW_SCHEMA, DOMAIN)
 
 _LOGGER = logging.getLogger(__name__)
 
-if TYPE_CHECKING:
-    from JciHitachi.api import JciHitachiAWSAPI
-
 async def validate_auth(hass, email, password, device_names, max_retries) -> None:
     """Validates JciHitachiAWS account and devices."""
-
-    _lazy_install()
-    from JciHitachi.api import JciHitachiAWSAPI
 
     api = JciHitachiAWSAPI(
         email=email,
