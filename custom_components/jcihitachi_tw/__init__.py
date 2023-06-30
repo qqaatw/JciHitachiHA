@@ -132,30 +132,35 @@ async def async_setup_entry(hass, config_entry):
     if config.get(CONF_DEVICES) == []:
         config[CONF_DEVICES] = None
 
-    api = JciHitachiAWSAPI(
-        email=config.get(CONF_EMAIL),
-        password=config.get(CONF_PASSWORD),
-        device_names=config.get(CONF_DEVICES),
-        max_retries=config.get(CONF_RETRY),
-    )
+    if DOMAIN not in hass.data:
+        api = JciHitachiAWSAPI(
+            email=config.get(CONF_EMAIL),
+            password=config.get(CONF_PASSWORD),
+            device_names=config.get(CONF_DEVICES),
+            max_retries=config.get(CONF_RETRY),
+        )
 
-    try:
-        await hass.async_add_executor_job(api.login)
-    except AssertionError as err:
-        _LOGGER.error(f"Assertion check error: {err}")
-        return False
-    except RuntimeError as err:
-        _LOGGER.error(f"Failed to login API: {err}")
-        return False
+        try:
+            await hass.async_add_executor_job(api.login)
+        except AssertionError as err:
+            _LOGGER.error(f"Assertion check error: {err}")
+            return False
+        except RuntimeError as err:
+            _LOGGER.error(f"Failed to login API: {err}")
+            return False
+        
+        hass.data[DOMAIN] = {}
+        hass.data[DOMAIN][API] = api
+    else:
+        assert API in hass.data[DOMAIN], f"The storage for {DOMAIN} exists but the API instance does not."
+        _LOGGER.debug("The API instance has been created in config flow, skipping login.")
 
     _LOGGER.debug(f"Backend version: {__version__}")
-    _LOGGER.debug(f"Thing info: {[thing for thing in api.things.values()]}")
+    _LOGGER.debug(f"Thing info: {[thing for thing in hass.data[DOMAIN][API].things.values()]}")
 
-    hass.data[DOMAIN] = {}
-    hass.data[DOMAIN][API] = api
     hass.data[DOMAIN][UPDATE_DATA] = Queue()
-    hass.data[DOMAIN][UPDATED_DATA] = api.get_status(legacy=True)
-    hass.data[DOMAIN][COORDINATOR] = build_coordinator(hass, api)
+    hass.data[DOMAIN][UPDATED_DATA] = hass.data[DOMAIN][API].get_status(legacy=True)
+    hass.data[DOMAIN][COORDINATOR] = build_coordinator(hass, hass.data[DOMAIN][API])
 
     # Start jcihitachi components
     _LOGGER.debug("Starting JciHitachi components.")

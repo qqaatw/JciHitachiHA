@@ -5,7 +5,7 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD
 from JciHitachi.api import JciHitachiAWSAPI
 
-from .const import (CONF_ADD_ANOTHER_DEVICE, CONF_RETRY,
+from .const import (API, CONF_ADD_ANOTHER_DEVICE, CONF_RETRY,
                     CONFIG_FLOW_ADD_DEVICE_SCHEMA, CONFIG_FLOW_SCHEMA, DOMAIN)
 
 _LOGGER = logging.getLogger(__name__)
@@ -13,13 +13,17 @@ _LOGGER = logging.getLogger(__name__)
 async def validate_auth(hass, email, password, device_names, max_retries) -> None:
     """Validates JciHitachiAWS account and devices."""
 
+    device_names_ = None if device_names == [] else device_names
+
     api = JciHitachiAWSAPI(
         email=email,
         password=password,
-        device_names=device_names,
+        device_names=device_names_,
         max_retries=max_retries,
     )
     await hass.async_add_executor_job(api.login)
+
+    hass.data[DOMAIN] = {API: api}
 
 
 class JciHitachiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
