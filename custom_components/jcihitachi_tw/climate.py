@@ -32,6 +32,15 @@ FAN_EXPRESS = "express"
 PRESET_MOLD_PREVENTION = "Mold Prev"
 PRESET_ECO_MOLD_PREVENTION = "Eco & Mold Prev"
 
+SWING_HORIZONTAL_LEFTMOST = "Horizontal Leftmost"
+SWING_HORIZONTAL_MIDDLE_LEFT = "Horizontal Middle Left"
+SWING_HORIZONTAL_MIDDLE_RIGHT = "Horizontal Middle Right"
+SWING_HORIZONTAL_RIGHTMOST = "Horizontal Rightmost"
+SWING_HORIZONTAL_LEFTMOST_VERTICAL_SWING = "Horizontal Leftmost + Vertical Swing"
+SWING_HORIZONTAL_MIDDLE_LEFT_VERTICAL_SWING = "Horizontal Middle Left + Vertical Swing"
+SWING_HORIZONTAL_MIDDLE_RIGHT_VERTICAL_SWING = "Horizontal Middle Right + Vertical Swing"
+SWING_HORIZONTAL_RIGHTMOST_VERTICAL_SWING = "Horizontal Rightmost + Vertical Swing"
+
 SUPPORT_FAN = [
     FAN_AUTO,
     FAN_SILENT,    
@@ -45,8 +54,17 @@ SUPPORT_SWING = [
     SWING_OFF,
     SWING_VERTICAL,
     SWING_HORIZONTAL,
-    SWING_BOTH
+    SWING_BOTH,
+    SWING_HORIZONTAL_LEFTMOST,
+    SWING_HORIZONTAL_MIDDLE_LEFT,
+    SWING_HORIZONTAL_MIDDLE_RIGHT,
+    SWING_HORIZONTAL_RIGHTMOST,
+    SWING_HORIZONTAL_LEFTMOST_VERTICAL_SWING,
+    SWING_HORIZONTAL_MIDDLE_LEFT_VERTICAL_SWING,
+    SWING_HORIZONTAL_MIDDLE_RIGHT_VERTICAL_SWING,
+    SWING_HORIZONTAL_RIGHTMOST_VERTICAL_SWING,
 ]
+
 SUPPORT_HVAC = [
     HVAC_MODE_OFF,
     HVAC_MODE_COOL,
@@ -210,14 +228,29 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     def swing_mode(self):
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
-            if status.vertical_wind_swingable == "enabled" and \
-                status.horizontal_wind_direction == "auto":
-                return SWING_BOTH
-            elif status.vertical_wind_swingable == "enabled":
+            if status.vertical_wind_swingable == "enabled":
+                if status.horizontal_wind_direction == "auto":
+                    return SWING_BOTH
+                elif status.horizontal_wind_direction == "leftmost":
+                    return SWING_HORIZONTAL_LEFTMOST_VERTICAL_SWING
+                elif status.horizontal_wind_direction == "middleleft":
+                    return SWING_HORIZONTAL_MIDDLE_LEFT_VERTICAL_SWING
+                elif status.horizontal_wind_direction == "middleright":
+                    return SWING_HORIZONTAL_MIDDLE_RIGHT_VERTICAL_SWING
+                elif status.horizontal_wind_direction == "rightmost":
+                    return SWING_HORIZONTAL_RIGHTMOST_VERTICAL_SWING
                 return SWING_VERTICAL
-            elif status.horizontal_wind_direction == "auto":
-                return SWING_HORIZONTAL
             else:
+                if status.horizontal_wind_direction == "auto":
+                    return SWING_HORIZONTAL
+                elif status.horizontal_wind_direction == "leftmost":
+                    return SWING_HORIZONTAL_LEFTMOST
+                elif status.horizontal_wind_direction == "middleleft":
+                    return SWING_HORIZONTAL_MIDDLE_LEFT
+                elif status.horizontal_wind_direction == "middleright":
+                    return SWING_HORIZONTAL_MIDDLE_RIGHT
+                elif status.horizontal_wind_direction == "rightmost":
+                    return SWING_HORIZONTAL_RIGHTMOST
                 return SWING_OFF
         _LOGGER.error("Missing swing_mode.")
         return None
@@ -352,6 +385,30 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         elif swing_mode == SWING_BOTH:
             self.put_queue(status_name="vertical_wind_swingable",  status_str_value="enabled")
             self.put_queue(status_name="horizontal_wind_direction", status_str_value="auto")
+        elif swing_mode == SWING_HORIZONTAL_LEFTMOST:
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="disabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="leftmost")
+        elif swing_mode == SWING_HORIZONTAL_MIDDLE_LEFT:
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="disabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="middleleft")
+        elif swing_mode == SWING_HORIZONTAL_MIDDLE_RIGHT:
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="disabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="middleright")
+        elif swing_mode == SWING_HORIZONTAL_RIGHTMOST:
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="disabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="rightmost")
+        elif swing_mode == SWING_HORIZONTAL_LEFTMOST_VERTICAL_SWING:
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="enabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="leftmost")
+        elif swing_mode == SWING_HORIZONTAL_MIDDLE_LEFT_VERTICAL_SWING:
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="enabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="middleleft")
+        elif swing_mode == SWING_HORIZONTAL_MIDDLE_RIGHT_VERTICAL_SWING:
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="enabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="middleright")
+        elif swing_mode == SWING_HORIZONTAL_RIGHTMOST_VERTICAL_SWING:
+            self.put_queue(status_name="vertical_wind_swingable", status_str_value="enabled")
+            self.put_queue(status_name="horizontal_wind_direction", status_str_value="rightmost")
         else:
             _LOGGER.error("Invalid swing_mode.")
         self.update()
