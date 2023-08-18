@@ -2,7 +2,7 @@
 
 [![System Status](https://github.com/qqaatw/LibJciHitachi/actions/workflows/Status.yml/badge.svg)](https://github.com/qqaatw/LibJciHitachi/actions/workflows/Status.yml)
 
-*If you find the project useful and want to support it, you can buy me a chocolate cake via [Jkopay](.github/jkopay.jpg) or [ko-fi](https://ko-fi.com/qqaatw).*
+*If you find the project useful and want to support it, you can buy me a chocolate cake via [Jkopay(街口)](.github/jkopay.jpg) or [ko-fi](https://ko-fi.com/qqaatw). Your name will be listed on [Chocolate Cake Buyers](ChocolateCakeBuyers.md).*
 
 ## Feature
 A home assistant integration for controlling Jci Hitachi devices, using [LibJciHitachi](https://github.com/qqaatw/LibJciHitachi) backend.
