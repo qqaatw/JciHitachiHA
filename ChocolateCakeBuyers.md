@@ -4,6 +4,10 @@
 
 |Name|Time|Amount|
 |----|----|------|
+| nebulaforest | Jan 09, 2024 14:09 | 600 NTD |
+| TsungYu | Jan 05, 2024 14:35 | 70 NTD |
+| a6 | Dec 31, 2023 00:27 | 496 NTD |
+| Jerry Huang | Dec 30, 2023 14:03 | 300 TWD |
 | Edison42 | Nov 03, 2023 00:00 | 2000 TWD |
 | ming0102 | Sep 21, 2023 08:48 | 300 TWD |
 | Morgan | Sep 17, 2023 20:00 PDT | 100 USD |
