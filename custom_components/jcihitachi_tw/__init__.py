@@ -19,7 +19,7 @@ from .const import (API, CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD, CONF_RETRY,
                     UPDATED_DATA)
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "number", "sensor", "switch"]
+PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "number", "sensor", "switch", "light"]
 DATA_UPDATE_INTERVAL = timedelta(seconds=30)
 BASE_TIMEOUT = 5
 
