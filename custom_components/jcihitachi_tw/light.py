@@ -31,6 +31,13 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
+    brightness_mapping = {
+        "bright": 255,
+        "dark": 170,
+        "off": 85,
+        "all_off": 0,
+    }
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
 
@@ -63,13 +70,7 @@ class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
     def brightness(self):
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
-            brightness_mapping = {
-                "bright": 255,
-                "dark": 170,
-                "off": 85,
-                "all_off": 0,
-            }
-            return brightness_mapping.get(status.display_brightness, 0)
+            return self.brightness_mapping.get(status.display_brightness, 0)
 
         _LOGGER.error("Missing brightness.")
         return 0
@@ -78,17 +79,19 @@ class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
         _LOGGER.debug(f"Turn {self.name} on")
         brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
         if brightness > 170:
-            brightness_value = 0
+            brightness_value = "bright"
         elif brightness <= 170 and brightness > 85:
-            brightness_value = 1
+            brightness_value = "dark"
         elif brightness <= 85 and brightness > 3:
-            brightness_value = 2
+            brightness_value = "off"
         else:
-            brightness_value = 3
-        self.put_queue(status_name="display_brightness", status_value=brightness_value)
+            brightness_value = "all_off"
+        self.put_queue(
+            status_name="display_brightness", status_str_value=brightness_value
+        )
         self.update()
 
     def turn_off(self, **kwargs):
         _LOGGER.debug(f"Turn {self.name} off")
-        self.put_queue(status_name="display_brightness", status_value=3)
+        self.put_queue(status_name="display_brightness", status_str_value="all_off")
         self.update()
