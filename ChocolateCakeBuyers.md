@@ -4,6 +4,7 @@
 
 |Name|Time|Amount|
 |----|----|------|
+| Edwin | Jan 18, 2024 18:44 | 888 NTD |
 | nebulaforest | Jan 09, 2024 14:09 | 600 NTD |
 | TsungYu | Jan 05, 2024 14:35 | 70 NTD |
 | a6 | Dec 31, 2023 00:27 | 496 NTD |
