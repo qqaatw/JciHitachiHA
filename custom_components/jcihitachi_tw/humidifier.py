@@ -69,8 +69,16 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         return self._supported_features
 
     @property
+    def current_humidity(self):
+        """Return the current humidity."""
+        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        if status:
+            return status.indoor_humidity
+        return None
+
+    @property
     def target_humidity(self):
-        """Return the current temperature."""
+        """Return the target humidity."""
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
             return status.target_humidity
