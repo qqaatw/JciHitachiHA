@@ -1,7 +1,7 @@
 """JciHitachi integration."""
 import logging
 
-from homeassistant.components.humidifier import (SUPPORT_MODES,
+from homeassistant.components.humidifier import (HumidifierEntityFeature,
                                                  HumidifierDeviceClass,
                                                  HumidifierEntity)
 
@@ -146,7 +146,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
 
     @staticmethod
     def calculate_supported_features(status):
-        support_flags = SUPPORT_MODES
+        support_flags = HumidifierEntityFeature.MODES
         return support_flags
 
     def set_mode(self, mode):
