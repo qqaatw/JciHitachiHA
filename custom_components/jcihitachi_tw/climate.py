@@ -5,18 +5,10 @@ from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (FAN_AUTO, FAN_DIFFUSE,
                                                     FAN_FOCUS, FAN_HIGH,
                                                     FAN_LOW, FAN_MEDIUM,
-                                                    HVAC_MODE_AUTO,
-                                                    HVAC_MODE_COOL,
-                                                    HVAC_MODE_DRY,
-                                                    HVAC_MODE_FAN_ONLY,
-                                                    HVAC_MODE_HEAT,
-                                                    HVAC_MODE_OFF,
+                                                    HVACMode,
                                                     PRESET_BOOST, PRESET_ECO,
                                                     PRESET_NONE,
-                                                    SUPPORT_FAN_MODE,
-                                                    SUPPORT_PRESET_MODE,
-                                                    SUPPORT_SWING_MODE,
-                                                    SUPPORT_TARGET_TEMPERATURE,
+                                                    ClimateEntityFeature,
                                                     SWING_BOTH,
                                                     SWING_HORIZONTAL,
                                                     SWING_OFF, SWING_VERTICAL)
@@ -66,12 +58,12 @@ SUPPORT_SWING = [
 ]
 
 SUPPORT_HVAC = [
-    HVAC_MODE_OFF,
-    HVAC_MODE_COOL,
-    HVAC_MODE_DRY,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_AUTO,
-    HVAC_MODE_HEAT,
+    HVACMode.OFF,
+    HVACMode.COOL,
+    HVACMode.DRY,
+    HVACMode.FAN_ONLY,
+    HVACMode.AUTO,
+    HVACMode.HEAT,
 ]
 
 
@@ -159,17 +151,17 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
             if status.power == "off":
-                return HVAC_MODE_OFF
+                return HVACMode.OFF
             elif status.mode == "cool":
-                return HVAC_MODE_COOL
+                return HVACMode.COOL
             elif status.mode == "dry":
-                return HVAC_MODE_DRY
+                return HVACMode.DRY
             elif status.mode == "fan":
-                return HVAC_MODE_FAN_ONLY
+                return HVACMode.FAN_ONLY
             elif status.mode == "auto":
-                return HVAC_MODE_AUTO
+                return HVACMode.AUTO
             elif status.mode == "heat":
-                return HVAC_MODE_HEAT
+                return HVACMode.HEAT
 
         _LOGGER.error("Missing hvac_mode")
         return None
@@ -264,10 +256,10 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         return f"{self._thing.gateway_mac_address}_climate"
 
     def calculate_supported_features(self):
-        support_flags = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE | SUPPORT_PRESET_MODE
+        support_flags = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE | ClimateEntityFeature.PRESET_MODE
         if self._thing.support_code.HorizontalWindDirectionSetting != "unsupported" and \
                 self._thing.support_code.VerticalWindDirectionSwitch != "unsupported":
-            support_flags |= SUPPORT_SWING_MODE
+            support_flags |= ClimateEntityFeature.SWING_MODE
         return support_flags
     
     def calculate_supported_presets(self):
@@ -297,20 +289,20 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         _LOGGER.debug(f"Set {self.name} hvac_mode to {hvac_mode}")
 
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
-        if status.power == "off" and hvac_mode != HVAC_MODE_OFF:
+        if status.power == "off" and hvac_mode != HVACMode.OFF:
             self.put_queue(status_name="power", status_str_value="on")
 
-        if hvac_mode == HVAC_MODE_OFF:
+        if hvac_mode == HVACMode.OFF:
             self.put_queue(status_name="power", status_str_value="off")
-        elif hvac_mode == HVAC_MODE_COOL:
+        elif hvac_mode == HVACMode.COOL:
             self.put_queue(status_name="mode", status_str_value="cool")
-        elif hvac_mode == HVAC_MODE_DRY:
+        elif hvac_mode == HVACMode.DRY:
             self.put_queue(status_name="mode", status_str_value="dry")
-        elif hvac_mode == HVAC_MODE_FAN_ONLY:
+        elif hvac_mode == HVACMode.FAN_ONLY:
             self.put_queue(status_name="mode", status_str_value="fan")
-        elif hvac_mode == HVAC_MODE_AUTO:
+        elif hvac_mode == HVACMode.AUTO:
             self.put_queue(status_name="mode", status_str_value="auto")
-        elif hvac_mode == HVAC_MODE_HEAT:
+        elif hvac_mode == HVACMode.HEAT:
             self.put_queue(status_name="mode", status_str_value="heat")
         else:
             _LOGGER.error("Invalid hvac_mode.")

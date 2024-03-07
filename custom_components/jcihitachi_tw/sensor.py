@@ -2,7 +2,7 @@
 import datetime
 import logging
 
-from homeassistant.components.sensor import (STATE_CLASS_TOTAL_INCREASING,
+from homeassistant.components.sensor import (SensorStateClass,
                                              SensorDeviceClass, SensorEntity)
 from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
                                  PERCENTAGE, UnitOfEnergy, UnitOfTemperature)
@@ -193,7 +193,7 @@ class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
 
     @property
     def state_class(self):
-        return STATE_CLASS_TOTAL_INCREASING
+        return SensorStateClass.TOTAL_INCREASING
 
 class JciHitachiMonthlyPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
     def __init__(self, thing, coordinator):
