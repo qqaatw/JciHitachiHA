@@ -24,10 +24,6 @@ DATA_UPDATE_INTERVAL = timedelta(seconds=30)
 BASE_TIMEOUT = 5
 
 
-class JciHitachiDataUpdateCoordinator(DataUpdateCoordinator):
-    def set_updated_data(self, device=None) -> None:
-        self.hass.loop.call_soon_threadsafe(self.async_set_updated_data, device)
-
 def build_coordinator(hass, api):
 
     timeout = BASE_TIMEOUT + len(api.things) * 2
@@ -54,7 +50,7 @@ def build_coordinator(hass, api):
         _LOGGER.debug(
             f"Latest data: {[(name, value.status) for name, value in hass.data[DOMAIN][UPDATED_DATA].items()]}")
 
-    coordinator = JciHitachiDataUpdateCoordinator(
+    coordinator = DataUpdateCoordinator(
         hass,
         _LOGGER,
         # Name of the data. For logging purposes.
@@ -247,4 +243,4 @@ class JciHitachiEntity(CoordinatorEntity):
         )
         
         # Important: We have to reset the update scheduler to prevent old status from wrongly being loaded. 
-        self.coordinator.set_updated_data(None)
+        self.hass.loop.call_soon_threadsafe(self.coordinator.async_set_updated_data, None)
