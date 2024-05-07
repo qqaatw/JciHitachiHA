@@ -243,4 +243,4 @@ class JciHitachiEntity(CoordinatorEntity):
         )
         
         # Important: We have to reset the update scheduler to prevent old status from wrongly being loaded. 
-        self.coordinator.async_set_updated_data(None)
+        self.hass.loop.call_soon_threadsafe(self.coordinator.async_set_updated_data, None)
