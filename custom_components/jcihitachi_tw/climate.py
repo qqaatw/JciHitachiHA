@@ -256,7 +256,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
         return f"{self._thing.gateway_mac_address}_climate"
 
     def calculate_supported_features(self):
-        support_flags = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE | ClimateEntityFeature.PRESET_MODE
+        support_flags = ClimateEntityFeature.TURN_ON | ClimateEntityFeature.TURN_OFF | ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE | ClimateEntityFeature.PRESET_MODE
         if self._thing.support_code.HorizontalWindDirectionSetting != "unsupported" and \
                 self._thing.support_code.VerticalWindDirectionSwitch != "unsupported":
             support_flags |= ClimateEntityFeature.SWING_MODE

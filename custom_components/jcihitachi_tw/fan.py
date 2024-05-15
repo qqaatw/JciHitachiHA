@@ -1,8 +1,7 @@
 """JciHitachi integration."""
 import logging
 
-from homeassistant.components.fan import (SUPPORT_PRESET_MODE,
-                                          SUPPORT_SET_SPEED, FanEntity)
+from homeassistant.components.fan import (FanEntity, FanEntityFeature)
 from homeassistant.util.percentage import (ordered_list_item_to_percentage,
                                            percentage_to_ordered_list_item)
 
@@ -108,9 +107,9 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     def calculate_supported_features(self):
         support_flags = 0
         if self._thing.support_code.FanSpeed != "unsupported":
-            support_flags |= SUPPORT_SET_SPEED
+            support_flags |= FanEntityFeature.SET_SPEED
         if self._thing.support_code.FanSpeed & 1 == 1:  # auto mode is at the first bit.
-            support_flags |= SUPPORT_PRESET_MODE
+            support_flags |= FanEntityFeature.PRESET_MODE
 
         return support_flags
     
