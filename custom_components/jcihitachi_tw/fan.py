@@ -221,9 +221,9 @@ class JciHitachiHeatExchangerFanEntity(JciHitachiEntity, FanEntity):
     def calculate_supported_features(self):
         support_flags = 0
         if self._thing.support_code.FanSpeed != "unsupported":
-            support_flags |= SUPPORT_SET_SPEED
+            support_flags |= FanEntityFeature.SET_SPEED
         if self._thing.support_code.BreathMode != "unsupported":
-            support_flags |= SUPPORT_PRESET_MODE
+            support_flags |= FanEntityFeature.PRESET_MODE
 
         return support_flags
     
