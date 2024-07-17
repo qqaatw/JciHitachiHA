@@ -18,7 +18,9 @@ async def _async_setup(hass, async_add):
                 [JciHitachiAirCleaningFilterEntity(thing, coordinator),
                  JciHitachiCleanFilterNotifySwitchEntity(thing, coordinator),
                  JciHitachiMoldPrevSwitchEntity(thing, coordinator),
-                 JciHitachiWindSwingableSwitchEntity(thing, coordinator)],
+                 JciHitachiWindSwingableSwitchEntity(thing, coordinator),
+                 JciHitachiIonSwitchEntity(thing, coordinator),
+                 JciHitachiKeypadLockSwitchEntity(thing, coordinator)],
                 update_before_add=True)
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -175,4 +177,76 @@ class JciHitachiWindSwingableSwitchEntity(JciHitachiEntity, SwitchEntity):
         """Turn wind swingable off."""
         _LOGGER.debug(f"Turn {self.name} off")
         self.put_queue(status_name="wind_swingable", status_str_value="disabled")
+        self.update()
+
+class JciHitachiIonSwitchEntity(JciHitachiEntity, SwitchEntity):
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
+
+    @property
+    def name(self):
+        """Return the name of the entity."""
+        return f"{self._thing.name} Ion"
+
+    @property
+    def is_on(self):
+        """Indicate whether ion is on."""
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status:
+            if status.ion == "disabled":
+                return False
+            else:
+                return True
+        return None
+
+    @property
+    def unique_id(self):
+        return f"{self._thing.gateway_mac_address}_ion_switch"
+
+    def turn_on(self):
+        """Turn ion on."""
+        _LOGGER.debug(f"Turn {self.name} on")
+        self.put_queue(status_name="Ion", status_str_value="enabled")
+        self.update()
+    
+    def turn_off(self):
+        """Turn ion off."""
+        _LOGGER.debug(f"Turn {self.name} off")
+        self.put_queue(status_name="Ion", status_str_value="disabled")
+        self.update()
+
+class JciHitachiKeypadLockSwitchEntity(JciHitachiEntity, SwitchEntity):
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
+
+    @property
+    def name(self):
+        """Return the name of the entity."""
+        return f"{self._thing.name} Keypad Lock"
+
+    @property
+    def is_on(self):
+        """Indicate whether keypad lock is on."""
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status:
+            if status.keypad_lock == "disabled":
+                return False
+            else:
+                return True
+        return None
+
+    @property
+    def unique_id(self):
+        return f"{self._thing.gateway_mac_address}_keypad_lock_switch"
+
+    def turn_on(self):
+        """Turn keypad lock on."""
+        _LOGGER.debug(f"Turn {self.name} on")
+        self.put_queue(status_name="KeypadLock", status_str_value="enabled")
+        self.update()
+    
+    def turn_off(self):
+        """Turn keypad lock off."""
+        _LOGGER.debug(f"Turn {self.name} off")
+        self.put_queue(status_name="KeypadLock", status_str_value="disabled")
         self.update()
