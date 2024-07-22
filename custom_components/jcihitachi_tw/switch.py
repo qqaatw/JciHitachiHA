@@ -193,7 +193,7 @@ class JciHitachiIonSwitchEntity(JciHitachiEntity, SwitchEntity):
         """Indicate whether ion is on."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
-            if status.ion == "disabled":
+            if status.Ion == "disabled":
                 return False
             else:
                 return True
@@ -229,7 +229,7 @@ class JciHitachiKeypadLockSwitchEntity(JciHitachiEntity, SwitchEntity):
         """Indicate whether keypad lock is on."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
-            if status.keypad_lock == "disabled":
+            if status.KeypadLock == "disabled":
                 return False
             else:
                 return True
