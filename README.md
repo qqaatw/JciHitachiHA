@@ -62,6 +62,8 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Power consumption 用電統計 (supports HA core v2021.9.0+)
   - Monthly power consumption 月用電統計
   - Display brightness 顯示器亮度
+  - Ion 負離子
+  - Keypad Lock 按鍵鎖
   - ~~Sound control 聲音控制~~ (Only supported by LibJciHitachi)
   - ~~Side vent 側吹~~ (Only supported by LibJciHitachi)
 - Hitachi Heat Exchanger 日立全熱交換機
