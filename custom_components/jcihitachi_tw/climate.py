@@ -123,6 +123,9 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
                 if status.mode in ["fan", "auto"]:
                     _LOGGER.debug(f"no target temp defined in {status.mode} mode, returning previous target: {self._prev_target}")
                     return self._prev_target
+                if status.energy_save == "enabled":
+                    _LOGGER.debug(f"no target temp defined in eco mode, returning previous target: {self._prev_target}")
+                    return self._prev_target
             else:
                 self._prev_target = status.target_temp
 
