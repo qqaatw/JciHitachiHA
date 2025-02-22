@@ -163,11 +163,9 @@ async def async_setup_entry(hass, config_entry):
     hass.data[DOMAIN][COORDINATOR] = build_coordinator(hass, hass.data[DOMAIN][API])
 
     # Start jcihitachi components
-    _LOGGER.debug("Starting JciHitachi components.")
-    for platform in PLATFORMS:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(config_entry, platform)
-        )
+    _LOGGER.debug("Starting JciHitachi components.") 
+    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+        
     
     # Return boolean to indicate that initialization was successful.
     return True
