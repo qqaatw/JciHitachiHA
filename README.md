@@ -10,7 +10,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 ## Installation
 
 ### With HACS (Recommended)
-1. Install [HACS](https://hacs.xyz/docs/installation/installation).
+1. Install [HACS](https://hacs.xyz/docs/use/download/download/).
 2. Click this button to open HACS and install the integration:
 
    [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=qqaatw&repository=JciHitachiHA)
