@@ -106,6 +106,8 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - RAS-28NJF / RAC-28NK
   - RAS-28NB / RAC-28NB
   - RAS-22NJF
+  - RAS-22NF [^1]
+  - RAS-50NF [^1]
 - Business
   - RPI-90FK
   - RPI-36FR
@@ -143,3 +145,5 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 ## License
 
 Apache License 2.0
+
+[^1]: The Wi-Fi modules in these models may not work due to Hitachi's server migration. Customers can request a free replacement if their machine is still under warranty.
