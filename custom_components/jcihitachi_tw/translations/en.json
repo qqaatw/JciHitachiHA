@@ -21,10 +21,101 @@
         "error": {
             "assertion_check_error": "The device(s) you specified is/are not available from the API.",
             "login_error": "Incorrect email or password.",
-            "unknown_error": "Unknown error occurred."            
+            "unknown_error": "Unknown error occurred."
         },
         "abort": {
             "already_configured": "Device already configured"
+        }
+    },
+    "entity": {
+        "sensor": {
+            "indoor_humidity_sensor": {
+                "name": "Indoor Humidity"
+            },
+            "pm25_sensor": {
+                "name": "PM2.5"
+            },
+            "odor_level_sensor": {
+                "name": "Odor Level"
+            },
+            "power_consumption_sensor": {
+                "name": "Power Consumption"
+            },
+            "monthly_power_consumption_sensor": {
+                "name": "Monthly Power Consumption"
+            },
+            "month_indicator_sensor": {
+                "name": "Month Indicator"
+            },
+            "indoor_temperature_sensor": {
+                "name": "Indoor Temperature"
+            }
+        },
+        "binary_sensor": {
+            "error_binary_sensor": {
+                "name": "Error"
+            },
+            "water_full_binary_sensor": {
+                "name": "Water Full Warning"
+            }
+        },
+        "light": {
+            "dehumidifier_light": {
+                "name": "Panel LED"
+            }
+        },
+        "fan": {
+            "dehumidifier_air_speed_fan": {
+                "name": "Air Speed"
+            },
+            "heat_exchanger_air_speed_fan": {
+                "name": "Air Speed"
+            }
+        },
+        "switch": {
+            "air_cleaning_filter_switch": {
+                "name": "Air Cleaning Filter Setting"
+            },
+            "clean_filter_notify_switch": {
+                "name": "Clean Filter Notification"
+            },
+            "mold_prev_switch": {
+                "name": "Mold Prevention"
+            },
+            "wind_swingable_switch": {
+                "name": "Wind Swingable"
+            },
+            "ion_switch": {
+                "name": "Ion"
+            },
+            "keypad_lock_switch": {
+                "name": "Keypad Lock"
+            }
+        },
+        "number": {
+            "month_selector_number": {
+                "name": "Month Selector"
+            }
+        },
+        "humidifier": {
+            "dehumidifier_humidifier": {
+                "name": "Dehumidifier",
+                "state_attributes": {
+                    "mode": {
+                        "name": "Mode",
+                        "state": {
+                            "auto": "Auto",
+                            "custom": "Custom",
+                            "continuous": "Continuous",
+                            "clothes_dry": "Clothes Dry",
+                            "air_purify": "Air Purify",
+                            "mold_prev": "Mold Prev",
+                            "low_humidity": "Low Humidity",
+                            "eco_comfort": "Eco Comfort"
+                        }
+                    }
+                }
+            }
         }
     }
 }

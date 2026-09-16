@@ -1,0 +1,121 @@
+{
+    "config": {
+        "flow_title": "JciHitachi TW",
+        "step": {
+            "user": {
+                "data": {
+                    "email": "JciHitachi 電子郵件",
+                    "password": "JciHitachi 密碼",
+                    "retry": "命令發送失敗時的重試次數",
+                    "devices": "裝置名稱 (留空以自動從 API 檢索)",
+                    "add_another_device": "添加另一個裝置？"
+                }
+            },
+            "add_device": {
+                "data": {
+                    "devices": "裝置名稱 (留空以自動從 API 檢索)",
+                    "add_another_device": "添加另一個裝置？"
+                }
+            }
+        },
+        "error": {
+            "assertion_check_error": "您指定的裝置不可從 API 獲得。",
+            "login_error": "電子郵件或密碼不正確。",
+            "unknown_error": "發生未知錯誤。"
+        },
+        "abort": {
+            "already_configured": "裝置已配置"
+        }
+    },
+    "entity": {
+        "sensor": {
+            "indoor_humidity_sensor": {
+                "name": "室內濕度"
+            },
+            "pm25_sensor": {
+                "name": "PM2.5"
+            },
+            "odor_level_sensor": {
+                "name": "異味等級"
+            },
+            "power_consumption_sensor": {
+                "name": "電力消耗"
+            },
+            "monthly_power_consumption_sensor": {
+                "name": "月度電力消耗"
+            },
+            "month_indicator_sensor": {
+                "name": "月份指示器"
+            },
+            "indoor_temperature_sensor": {
+                "name": "室內溫度"
+            }
+        },
+        "binary_sensor": {
+            "error_binary_sensor": {
+                "name": "錯誤"
+            },
+            "water_full_binary_sensor": {
+                "name": "水滿警告"
+            }
+        },
+        "light": {
+            "dehumidifier_light": {
+                "name": "面板 LED"
+            }
+        },
+        "fan": {
+            "dehumidifier_air_speed_fan": {
+                "name": "風速"
+            },
+            "heat_exchanger_air_speed_fan": {
+                "name": "風速"
+            }
+        },
+        "switch": {
+            "air_cleaning_filter_switch": {
+                "name": "空氣淨化濾網設置"
+            },
+            "clean_filter_notify_switch": {
+                "name": "清潔濾網通知"
+            },
+            "mold_prev_switch": {
+                "name": "防霉"
+            },
+            "wind_swingable_switch": {
+                "name": "風向擺動"
+            },
+            "ion_switch": {
+                "name": "負離子"
+            },
+            "keypad_lock_switch": {
+                "name": "按鍵鎖定"
+            }
+        },
+        "number": {
+            "month_selector_number": {
+                "name": "月份選擇器"
+            }
+        },
+        "humidifier": {
+            "dehumidifier_humidifier": {
+                "name": "除濕機",
+                "state_attributes": {
+                    "mode": {
+                        "name": "運作模式",
+                        "state": {
+                            "auto": "自動",
+                            "custom": "自訂",
+                            "continuous": "連續",
+                            "clothes_dry": "衣物乾燥",
+                            "air_purify": "空氣淨化",
+                            "mold_prev": "防霉",
+                            "low_humidity": "低濕度",
+                            "eco_comfort": "舒適節能"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -9,14 +9,14 @@ from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-MODE_AUTO = "Auto"
-MODE_CUSTOM = "Custom"
-MODE_CONTINUOUS = "Continuous"
-MODE_CLOTHES_DRY = "Clothes Dry"
-MODE_AIR_PURIFY = "Air Purify"
-MODE_MOLD_PREV = "Mold Prev"
-MODE_LOW_HUMIDITY = "Low Humidity"
-MODE_ECO_COMFORT = "Eco Comfort"
+MODE_AUTO = "auto"
+MODE_CUSTOM = "custom"
+MODE_CONTINUOUS = "continuous"
+MODE_CLOTHES_DRY = "clothes_dry"
+MODE_AIR_PURIFY = "air_purify"
+MODE_MOLD_PREV = "mold_prev"
+MODE_LOW_HUMIDITY = "low_humidity"
+MODE_ECO_COMFORT = "eco_comfort"
 
 AVAILABLE_MODES = [
     MODE_AUTO,
@@ -62,6 +62,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
         super().__init__(thing, coordinator)
         self._supported_features = supported_features
         self._available_modes = [mode for i, mode in enumerate(AVAILABLE_MODES) if 2 ** i & self._thing.support_code.Mode != 0]
+        self._attr_translation_key = "dehumidifier_humidifier"
 
     @property
     def supported_features(self):
@@ -100,22 +101,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     def mode(self):
         status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
         if status:
-            if status.mode == "auto":
-                return MODE_AUTO
-            elif status.mode == "custom":
-                return MODE_CUSTOM
-            elif status.mode == "continuous":
-                return MODE_CONTINUOUS
-            elif status.mode == "clothes_dry":
-                return MODE_CLOTHES_DRY
-            elif status.mode == "air_purify":
-                return MODE_AIR_PURIFY
-            elif status.mode == "mold_prev":
-                return MODE_MOLD_PREV
-            elif status.mode == "low_humidity":
-                return MODE_LOW_HUMIDITY
-            elif status.mode == "eco_comfort":
-                return MODE_ECO_COMFORT
+            return status.mode
 
         _LOGGER.error("Missing mode.")
         return None
@@ -154,22 +140,9 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
 
         _LOGGER.debug(f"Set {self.name} mode to {mode}")
 
-        if mode == MODE_AUTO:
-            self.put_queue(status_name="mode", status_str_value="auto")
-        elif mode == MODE_CUSTOM:
-            self.put_queue(status_name="mode", status_str_value="custom")
-        elif mode == MODE_CONTINUOUS:
-            self.put_queue(status_name="mode", status_str_value="continuous")
-        elif mode == MODE_CLOTHES_DRY:
-            self.put_queue(status_name="mode", status_str_value="clothes_dry")
-        elif mode == MODE_AIR_PURIFY:
-            self.put_queue(status_name="mode", status_str_value="air_purify")
-        elif mode == MODE_MOLD_PREV:
-            self.put_queue(status_name="mode", status_str_value="mold_prev")
-        elif mode == MODE_LOW_HUMIDITY:
-            self.put_queue(status_name="mode", status_str_value="low_humidity")
-        elif mode == MODE_ECO_COMFORT:
-            self.put_queue(status_name="mode", status_str_value="eco_comfort")
+        if mode in [MODE_AUTO, MODE_CUSTOM, MODE_CONTINUOUS, MODE_CLOTHES_DRY,
+                    MODE_AIR_PURIFY, MODE_MOLD_PREV, MODE_LOW_HUMIDITY, MODE_ECO_COMFORT]:
+            self.put_queue(status_name="mode", status_str_value=mode)
         else:
             _LOGGER.error("Invalid mode.")
         self.update()

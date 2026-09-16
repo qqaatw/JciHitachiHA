@@ -50,11 +50,7 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
         super().__init__(thing, coordinator)
         self._supported_features = self.calculate_supported_features()
         self._supported_fan_speeds = self.calculate_supported_fan_speeds()
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Air Speed"
+        self._attr_translation_key = "dehumidifier_air_speed_fan"
 
     @property
     def supported_features(self):
@@ -167,11 +163,7 @@ class JciHitachiHeatExchangerFanEntity(JciHitachiEntity, FanEntity):
         self._supported_features = self.calculate_supported_features()
         self._supported_fan_speeds = self.calculate_supported_fan_speeds()
         self._supported_presets = self.calculate_supported_presets()
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Air Speed"
+        self._attr_translation_key = "heat_exchanger_air_speed_fan"
 
     @property
     def supported_features(self):
