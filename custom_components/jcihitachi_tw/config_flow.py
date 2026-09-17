@@ -1,4 +1,5 @@
 """JciHitachi integration."""
+import httpx
 import logging
 
 from homeassistant import config_entries
@@ -27,7 +28,7 @@ async def validate_auth(hass, email, password, device_names, max_retries) -> Non
     # login() returns even when every device failed (each thing carries its reason); for the
     # config flow that is still a failure the user must see, so surface it as a device error
     if api.things and not any(thing.available for thing in api.things.values()):
-        api.logout()
+        await hass.async_add_executor_job(api.logout)
         raise JciHitachiDeviceError(
             " | ".join(
                 f"{name}: {thing.attention_reason}" for name, thing in api.things.items()
@@ -78,7 +79,7 @@ class JciHitachiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 # the backend cannot decode); details are logged per device by the backend
                 _LOGGER.error(f"Logged in, but no device answered: {err}")
                 errors['base'] = 'device_error'
-            except RuntimeError as err:
+            except (RuntimeError, httpx.HTTPError, ValueError) as err:
                 _LOGGER.error(f"Failed to reach the Hitachi cloud: {err}")
                 errors['base'] = 'connection_error'
             except Exception as err:

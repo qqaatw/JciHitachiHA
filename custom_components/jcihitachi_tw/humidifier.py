@@ -40,9 +40,10 @@ async def _async_setup(hass, async_add):
     for thing in api.things.values():
         if thing.type == "DH":
             status = hass.data[DOMAIN][UPDATED_DATA].get(thing.name, None)
-            if status is None:
+            if status is None or thing.support_code is None:
                 # never refreshed successfully (see thing.attention_reason); the entity
-                # needs the status to know its supported features
+                # needs the status for its features and the support code for its modes and
+                # humidity range; the coordinator reloads the entry once both are there
                 _LOGGER.warning(
                     f"Skipping humidifier entity for {thing.name}: {thing.attention_reason}"
                 )
