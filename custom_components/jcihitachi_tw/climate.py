@@ -15,6 +15,7 @@ from homeassistant.components.climate.const import (FAN_AUTO, FAN_DIFFUSE,
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
+from .const import SUPPORT_CACHE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -73,6 +74,14 @@ async def _async_setup(hass, async_add):
 
     for thing in api.things.values():
         if thing.type == "AC":
+            if thing.support_code is None:
+                # supported modes / fan speeds come from the support code; without it the
+                # climate entity cannot be built. The coordinator reloads the entry once the
+                # device answers, so the entity appears then.
+                _LOGGER.warning(
+                    f"Skipping climate entity for {thing.name}: {thing.attention_reason}"
+                )
+                continue
             async_add(
                 [JciHitachiClimateEntity(thing, coordinator)],
                 update_before_add=True
@@ -88,6 +97,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
+    _attr_name = None  # the device name
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
         self._supported_features = self.calculate_supported_features()
@@ -109,7 +120,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.indoor_temp
         return None
@@ -117,7 +128,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     @property
     def target_temperature(self):
         """Return the target temperature."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.target_temp == 65535:
                 if status.mode in ["fan", "auto"]:
@@ -140,18 +151,22 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     @property
     def max_temp(self):
         """Return the maximum temperature."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
-        return status.max_temp
-    
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status:
+            return status.max_temp
+        return self._thing.support_code.max_temp
+
     @property
     def min_temp(self):
         """Return the minimum temperature."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
-        return status.min_temp
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status:
+            return status.min_temp
+        return self._thing.support_code.min_temp
 
     @property
     def hvac_mode(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.power == "off":
                 return HVACMode.OFF
@@ -175,7 +190,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     
     @property
     def preset_mode(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.energy_save == "enabled" and status.mold_prev == "enabled":
                 return PRESET_ECO_MOLD_PREVENTION
@@ -196,7 +211,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
     @property
     def fan_mode(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.air_speed == "auto":
                 return FAN_AUTO
@@ -221,7 +236,7 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     
     @property
     def swing_mode(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.vertical_wind_swingable == "enabled":
                 if status.horizontal_wind_direction == "auto":
@@ -253,6 +268,14 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
     @property
     def swing_modes(self):
         return SUPPORT_SWING
+
+    @property
+    def extra_state_attributes(self):
+        """When the controls rely on a saved support code: when it was read (support_cache.py)."""
+        cache = self.hass.data.get(DOMAIN, {}).get(SUPPORT_CACHE)
+        return {
+            "capabilities_saved_at": cache.saved_at(self._thing.name, self._thing) if cache else None
+        }
 
     @property
     def unique_id(self):
@@ -291,7 +314,12 @@ class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
 
         _LOGGER.debug(f"Set {self.name} hvac_mode to {hvac_mode}")
 
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status is None:
+            _LOGGER.warning(
+                f"Cannot set hvac_mode on {self.name}: no status available ({self._thing.attention_reason})"
+            )
+            return
         if status.power == "off" and hvac_mode != HVACMode.OFF:
             self.put_queue(status_name="power", status_str_value="on")
 

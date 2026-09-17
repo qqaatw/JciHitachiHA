@@ -21,10 +21,133 @@
         "error": {
             "assertion_check_error": "The device(s) you specified is/are not available from the API.",
             "login_error": "Incorrect email or password.",
-            "unknown_error": "Unknown error occurred."            
+            "device_error": "Logged in, but none of your devices answered. Make sure they are online and close the official app, then try again. The reason for each device is in the Home Assistant log.",
+            "connection_error": "Could not reach the Hitachi cloud. Check the Home Assistant log and try again.",
+            "unknown_error": "Unknown error occurred."
         },
         "abort": {
             "already_configured": "Device already configured"
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "error": {
+                "name": "Error"
+            },
+            "water_full": {
+                "name": "Water Full Warning"
+            },
+            "attention_required": {
+                "name": "Attention Required"
+            },
+            "freeze_clean_notification": {
+                "name": "Freeze Clean Notification",
+                "state": {
+                    "on": "Clean needed",
+                    "off": "Not needed"
+                }
+            }
+        },
+        "fan": {
+            "air_speed": {
+                "name": "Air Speed"
+            }
+        },
+        "light": {
+            "panel_led": {
+                "name": "panel LED"
+            }
+        },
+        "select": {
+            "month_selector": {
+                "name": "Month Selector"
+            }
+        },
+        "sensor": {
+            "indoor_humidity": {
+                "name": "Indoor Humidity"
+            },
+            "pm25": {
+                "name": "PM2.5"
+            },
+            "odor_level": {
+                "name": "Odor Level"
+            },
+            "power_consumption": {
+                "name": "Power Consumption"
+            },
+            "monthly_power_consumption": {
+                "name": "Monthly Power Consumption"
+            },
+            "month_indicator": {
+                "name": "Month Indicator"
+            },
+            "indoor_temperature": {
+                "name": "Indoor Temperature"
+            },
+            "freeze_clean_status": {
+                "name": "Freeze Clean Status",
+                "state": {
+                    "idle": "Idle",
+                    "starting": "Starting",
+                    "cleaning": "Cleaning"
+                }
+            }
+        },
+        "switch": {
+            "air_cleaning_filter": {
+                "name": "Air Cleaning Filter Setting"
+            },
+            "clean_filter_notify": {
+                "name": "Clean Filter Notification"
+            },
+            "mold_prevention": {
+                "name": "Mold Prevention"
+            },
+            "wind_swingable": {
+                "name": "Wind Swingable"
+            },
+            "ion": {
+                "name": "Ion"
+            },
+            "keypad_lock": {
+                "name": "Keypad Lock"
+            },
+            "freeze_clean": {
+                "name": "Freeze Clean"
+            }
+        }
+    },
+    "exceptions": {
+        "attention_undecodable": {
+            "message": "{request} request: the answer on {topic} is not JSON ({payload_length} bytes, hex {payload_hex}). Its meaning is unknown."
+        },
+        "attention_no_data": {
+            "message": "{request} request: no JSON answer arrived on {topic} in this poll."
+        },
+        "attention_timeout": {
+            "message": "{request} request: sending the request failed or did not complete."
+        },
+        "attention_cleared": {
+            "message": "All requests are answered normally again."
+        },
+        "note_support_code": {
+            "message": "Status is still read; entities that need the support code (climate, humidifier) are created once it answers JSON. It is asked again on every poll."
+        },
+        "note_status_code": {
+            "message": "The device is shown as unavailable until its status answers again. It is asked again on every poll."
+        },
+        "note_shadow": {
+            "message": "The shadow does not affect availability."
+        },
+        "observed_support_code_undecodable": {
+            "message": "Observed 2026-09-16/17: this lasted from about 20 minutes to more than an hour."
+        },
+        "observed_status_code_no_data": {
+            "message": "Observed 2026-09-17: it recovered within 3 minutes, twice."
+        },
+        "note_support_code_saved": {
+            "message": "Using the support code saved at {saved_at}: the controls stay available and commands still take effect (verified 2026-09-17 on a unit in this state: power, mode, fan speed, temperature). It is asked again on every poll and replaced once it answers JSON."
         }
     }
 }
