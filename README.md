@@ -48,9 +48,14 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Energy saving 節電
   - Fast operation 快速運轉
   - Power consumption 用電統計 (supports HA core v2021.9.0+)
-  - Monthly power consumption 月用電統計
+  - Monthly power consumption 月用電統計 (pick the month in the Month selector 選擇月份 drop-down, which lists the months the Hitachi cloud returns, newest first, today's month by default; the cloud keeps the current month and the 12 before it)
   - ~~Sleep timer 睡眠計時器~~ (Only supported by LibJciHitachi)
-  - ~~Freeze clean 凍結洗淨~~ (Only supported by LibJciHitachi)
+  - Freeze clean 凍結洗淨 (switch, **experimental**: verified on one RAD-series family only; a unit may ignore a start it cannot carry out even though the cloud acknowledges it, so check the status code after starting; each command keeps the cloud's answer in the switch attributes)
+  - Freeze clean status 凍結洗淨狀態 (diagnostic sensor from `CleanStatus`: Idle 待機 / Starting 啟動中 / Cleaning 洗淨中, named from what one RAD-series family reported; other values show as unknown, the raw number is in `raw_value`)
+  - Freeze clean notification 凍結洗淨提醒 (binary sensor from the status field `CleanNotification`, shown as "Clean needed" / "Not needed")
+- All device types
+  - Entity names follow your Home Assistant language (English, 繁體中文); `translations/zh-Hant.json` uses the Taiwan wording of this list
+  - Attention required 需要處理 (binary sensor: on when the cloud did not answer for this device, or answered with a payload the backend cannot decode; the exact reason, including the raw bytes, is in the `reason` attribute; each change of reason, and the recovery, is also written to the activity log in your Home Assistant language)
 - Hitachi Dehumidifier 日立除濕機
   - Power 電源
   - Mode 運轉模式
@@ -66,7 +71,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Odor level 異味等級
   - Air cleaning filter setting 空氣清淨濾網設定
   - Power consumption 用電統計 (supports HA core v2021.9.0+)
-  - Monthly power consumption 月用電統計
+  - Monthly power consumption 月用電統計 (pick the month in the Month selector 選擇月份 drop-down, which lists the months the Hitachi cloud returns, newest first, today's month by default; the cloud keeps the current month and the 12 before it)
   - Display brightness 顯示器亮度
   - Ion 負離子
   - Keypad Lock 按鍵鎖

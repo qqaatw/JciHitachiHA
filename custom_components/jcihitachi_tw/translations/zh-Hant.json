@@ -1,0 +1,153 @@
+{
+    "config": {
+        "flow_title": "日立雲端智慧控（JciHitachi TW）",
+        "step": {
+            "user": {
+                "data": {
+                    "email": "日立雲端帳號（Email）",
+                    "password": "日立雲端密碼",
+                    "retry": "指令送出失敗時的重試次數",
+                    "devices": "裝置名稱（留空則自動從雲端取得全部裝置）",
+                    "add_another_device": "再新增一台裝置？"
+                }
+            },
+            "add_device": {
+                "data": {
+                    "devices": "裝置名稱（留空則自動從雲端取得全部裝置）",
+                    "add_another_device": "再新增一台裝置？"
+                }
+            }
+        },
+        "error": {
+            "assertion_check_error": "你指定的裝置在雲端帳號下找不到。",
+            "login_error": "帳號或密碼錯誤。",
+            "device_error": "已成功登入，但沒有任何裝置回應。請確認裝置在線上、關閉官方 app 後再試一次；每台裝置的原因記錄在 Home Assistant 的日誌裡。",
+            "connection_error": "無法連上日立雲端。請查看 Home Assistant 日誌後再試一次。",
+            "unknown_error": "發生未知錯誤。"
+        },
+        "abort": {
+            "already_configured": "裝置已經設定過了"
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "error": {
+                "name": "錯誤警示"
+            },
+            "water_full": {
+                "name": "滿水警示"
+            },
+            "attention_required": {
+                "name": "需要處理"
+            },
+            "freeze_clean_notification": {
+                "name": "凍結洗淨提醒",
+                "state": {
+                    "on": "需要洗淨",
+                    "off": "不需要"
+                }
+            }
+        },
+        "fan": {
+            "air_speed": {
+                "name": "風速"
+            }
+        },
+        "light": {
+            "panel_led": {
+                "name": "面板指示燈"
+            }
+        },
+        "select": {
+            "month_selector": {
+                "name": "選擇月份"
+            }
+        },
+        "sensor": {
+            "indoor_humidity": {
+                "name": "室內濕度"
+            },
+            "pm25": {
+                "name": "PM2.5"
+            },
+            "odor_level": {
+                "name": "異味等級"
+            },
+            "power_consumption": {
+                "name": "用電量"
+            },
+            "monthly_power_consumption": {
+                "name": "月用電量"
+            },
+            "month_indicator": {
+                "name": "用電統計月份"
+            },
+            "indoor_temperature": {
+                "name": "室內溫度"
+            },
+            "freeze_clean_status": {
+                "name": "凍結洗淨狀態",
+                "state": {
+                    "idle": "待機",
+                    "starting": "啟動中",
+                    "cleaning": "洗淨中"
+                }
+            }
+        },
+        "switch": {
+            "air_cleaning_filter": {
+                "name": "空氣清淨濾網設定"
+            },
+            "clean_filter_notify": {
+                "name": "濾網清潔通知"
+            },
+            "mold_prevention": {
+                "name": "機體防霉"
+            },
+            "wind_swingable": {
+                "name": "導風板擺動"
+            },
+            "ion": {
+                "name": "負離子"
+            },
+            "keypad_lock": {
+                "name": "按鍵鎖"
+            },
+            "freeze_clean": {
+                "name": "凍結洗淨"
+            }
+        }
+    },
+    "exceptions": {
+        "attention_undecodable": {
+            "message": "{request} 請求：{topic} 的回應不是 JSON（{payload_length} bytes，hex {payload_hex}），含義未知。"
+        },
+        "attention_no_data": {
+            "message": "{request} 請求：這一輪在 {topic} 沒有收到 JSON 回應。"
+        },
+        "attention_timeout": {
+            "message": "{request} 請求：送出失敗或沒有完成。"
+        },
+        "attention_cleared": {
+            "message": "所有請求都已正常回應。"
+        },
+        "note_support_code": {
+            "message": "status 仍會讀取；需要 support code 的實體（climate、humidifier）會在它回 JSON 後建立。每次輪詢都會再問一次。"
+        },
+        "note_status_code": {
+            "message": "status 恢復回應前，這台顯示為不可用。每次輪詢都會再問一次。"
+        },
+        "note_shadow": {
+            "message": "shadow 不影響可用與否。"
+        },
+        "observed_support_code_undecodable": {
+            "message": "2026-09-16／17 觀察：持續時間從約 20 分鐘到一小時以上不等。"
+        },
+        "observed_status_code_no_data": {
+            "message": "2026-09-17 觀察：兩次都在 3 分鐘內恢復。"
+        },
+        "note_support_code_saved": {
+            "message": "暫用 {saved_at} 記住的 support code：控制照常可用，指令仍會生效（2026-09-17 在同樣狀態的機器上驗證開關、模式、風速、溫度）。每次輪詢都會再問一次，回 JSON 後即更新。"
+        }
+    }
+}

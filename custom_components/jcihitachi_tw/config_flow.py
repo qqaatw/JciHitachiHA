@@ -3,7 +3,8 @@ import logging
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD
-from JciHitachi.api import JciHitachiAWSAPI
+from JciHitachi.api import (JciHitachiAuthError, JciHitachiAWSAPI,
+                            JciHitachiDeviceError)
 
 from .const import (API, CONF_ADD_ANOTHER_DEVICE, CONF_RETRY,
                     CONFIG_FLOW_ADD_DEVICE_SCHEMA, CONFIG_FLOW_SCHEMA, DOMAIN)
@@ -22,6 +23,16 @@ async def validate_auth(hass, email, password, device_names, max_retries) -> Non
         max_retries=max_retries,
     )
     await hass.async_add_executor_job(api.login)
+
+    # login() returns even when every device failed (each thing carries its reason); for the
+    # config flow that is still a failure the user must see, so surface it as a device error
+    if api.things and not any(thing.available for thing in api.things.values()):
+        api.logout()
+        raise JciHitachiDeviceError(
+            " | ".join(
+                f"{name}: {thing.attention_reason}" for name, thing in api.things.items()
+            )
+        )
 
     hass.data[DOMAIN] = {API: api}
 
@@ -59,9 +70,17 @@ class JciHitachiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except AssertionError as err:
                 _LOGGER.error(f"Assertion check error: {err}")
                 errors['base'] = 'assertion_check_error'
-            except RuntimeError as err:
+            except JciHitachiAuthError as err:
                 _LOGGER.error(f"Failed to login API: {err}")
                 errors['base'] = 'login_error'
+            except JciHitachiDeviceError as err:
+                # account is fine, the devices are not (offline, or answering with a payload
+                # the backend cannot decode); details are logged per device by the backend
+                _LOGGER.error(f"Logged in, but no device answered: {err}")
+                errors['base'] = 'device_error'
+            except RuntimeError as err:
+                _LOGGER.error(f"Failed to reach the Hitachi cloud: {err}")
+                errors['base'] = 'connection_error'
             except Exception as err:
                 _LOGGER.error(f"Failed to login API: {err}")
                 errors['base'] = 'unknown_error'

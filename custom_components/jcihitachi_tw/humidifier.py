@@ -6,6 +6,7 @@ from homeassistant.components.humidifier import (HumidifierEntityFeature,
                                                  HumidifierEntity)
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
+from .const import SUPPORT_CACHE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +39,14 @@ async def _async_setup(hass, async_add):
 
     for thing in api.things.values():
         if thing.type == "DH":
-            status = hass.data[DOMAIN][UPDATED_DATA][thing.name]
+            status = hass.data[DOMAIN][UPDATED_DATA].get(thing.name, None)
+            if status is None:
+                # never refreshed successfully (see thing.attention_reason); the entity
+                # needs the status to know its supported features
+                _LOGGER.warning(
+                    f"Skipping humidifier entity for {thing.name}: {thing.attention_reason}"
+                )
+                continue
             supported_features = JciHitachiDehumidifierEntity.calculate_supported_features(
                 status
             )
@@ -58,6 +66,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
+    _attr_name = None  # the device name
+
     def __init__(self, thing, coordinator, supported_features):
         super().__init__(thing, coordinator)
         self._supported_features = supported_features
@@ -71,7 +81,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     @property
     def current_humidity(self):
         """Return the current humidity."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.indoor_humidity
         return None
@@ -79,7 +89,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     @property
     def target_humidity(self):
         """Return the target humidity."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.target_humidity
         return None
@@ -87,18 +97,22 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     @property
     def max_humidity(self):
         """Return the maximum humidity."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
-        return status.max_humidity
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status:
+            return status.max_humidity
+        return self._thing.support_code.max_humidity
 
     @property
     def min_humidity(self):
         """Return the minimum humidity."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
-        return status.min_humidity
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status:
+            return status.min_humidity
+        return self._thing.support_code.min_humidity
 
     @property
     def mode(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.mode == "auto":
                 return MODE_AUTO
@@ -126,7 +140,7 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
 
     @property
     def is_on(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.power == "off":
                 return False
@@ -139,6 +153,14 @@ class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
     @property
     def device_class(self):
         return HumidifierDeviceClass.DEHUMIDIFIER
+
+    @property
+    def extra_state_attributes(self):
+        """When the controls rely on a saved support code: when it was read (support_cache.py)."""
+        cache = self.hass.data.get(DOMAIN, {}).get(SUPPORT_CACHE)
+        return {
+            "capabilities_saved_at": cache.saved_at(self._thing.name, self._thing) if cache else None
+        }
 
     @property
     def unique_id(self):

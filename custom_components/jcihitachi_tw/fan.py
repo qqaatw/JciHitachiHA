@@ -46,15 +46,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
+    _attr_translation_key = "air_speed"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
         self._supported_features = self.calculate_supported_features()
         self._supported_fan_speeds = self.calculate_supported_fan_speeds()
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Air Speed"
 
     @property
     def supported_features(self):
@@ -64,7 +61,7 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     @property
     def is_on(self):
         """Return true if the entity is on"""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.power == "off":
                 return False
@@ -77,7 +74,9 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
     @property
     def percentage(self):
         """Return the current speed percentage."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status is None:
+            return None
         return ordered_list_item_to_percentage(self._supported_fan_speeds, status.air_speed)
     
     @property
@@ -87,7 +86,7 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
 
     @property
     def preset_mode(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.air_speed == "auto":
                 return "auto"
@@ -162,16 +161,13 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
 
 
 class JciHitachiHeatExchangerFanEntity(JciHitachiEntity, FanEntity):
+    _attr_translation_key = "air_speed"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
         self._supported_features = self.calculate_supported_features()
         self._supported_fan_speeds = self.calculate_supported_fan_speeds()
         self._supported_presets = self.calculate_supported_presets()
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Air Speed"
 
     @property
     def supported_features(self):
@@ -181,7 +177,7 @@ class JciHitachiHeatExchangerFanEntity(JciHitachiEntity, FanEntity):
     @property
     def is_on(self):
         """Return true if the entity is on"""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.Switch == "off":
                 return False
@@ -194,7 +190,9 @@ class JciHitachiHeatExchangerFanEntity(JciHitachiEntity, FanEntity):
     @property
     def percentage(self):
         """Return the current speed percentage."""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status is None:
+            return None
         return ordered_list_item_to_percentage(self._supported_fan_speeds, status.FanSpeed)
     
     @property
@@ -204,7 +202,7 @@ class JciHitachiHeatExchangerFanEntity(JciHitachiEntity, FanEntity):
 
     @property
     def preset_mode(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             return status.BreathMode
         _LOGGER.error("Missing preset_mode.")
