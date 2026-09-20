@@ -7,6 +7,8 @@ from queue import Queue
 from typing import Optional
 
 import async_timeout
+import httpx
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import discovery
 from homeassistant.helpers.update_coordinator import (CoordinatorEntity,
                                                       DataUpdateCoordinator,
@@ -142,6 +144,10 @@ async def async_setup_entry(hass, config_entry):
 
         try:
             await hass.async_add_executor_job(api.login)
+        except (httpx.TransportError, TimeoutError) as err:
+            raise ConfigEntryNotReady(
+                "Unable to reach Hitachi cloud; retrying setup"
+            ) from err
         except AssertionError as err:
             _LOGGER.error(f"Assertion check error: {err}")
             return False
