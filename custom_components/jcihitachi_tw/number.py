@@ -28,15 +28,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiMonthlyDataSelectorNumberEntity(JciHitachiEntity, NumberEntity):
+    _attr_translation_key = "month_selector"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
         self._value = 0
 
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Month Selector"
-    
     @property
     def native_value(self):
         """Return the value of the entity."""

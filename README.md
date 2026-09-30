@@ -50,7 +50,11 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Power consumption 用電統計 (supports HA core v2021.9.0+)
   - Monthly power consumption 月用電統計
   - ~~Sleep timer 睡眠計時器~~ (Only supported by LibJciHitachi)
-  - ~~Freeze clean 凍結洗淨~~ (Only supported by LibJciHitachi)
+  - Freeze clean 凍結洗淨 (switch, **experimental**: verified on one RAD-series family only; a unit may ignore a start it cannot carry out even though the cloud acknowledges it, so check the status code after starting; with a LibJciHitachi version that records it, the switch attributes show the cloud's answer to the last command)
+  - Freeze clean status 凍結洗淨狀態 (diagnostic sensor from `CleanStatus`: Idle 待機 / Starting 啟動中 / Cleaning 洗淨中, named from what one RAD-series family reported; other values show as unknown, the raw number is in `raw_value`)
+  - Freeze clean notification 凍結洗淨提醒 (binary sensor from the status field `CleanNotification`, shown as "Clean needed" / "Not needed")
+- All device types
+  - Entity names follow your Home Assistant language (English, 繁體中文); `translations/zh-Hant.json` uses the Taiwan wording of this list
 - Hitachi Dehumidifier 日立除濕機
   - Power 電源
   - Mode 運轉模式
