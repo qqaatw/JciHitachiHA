@@ -1,4 +1,5 @@
 """JciHitachi integration."""
+import httpx
 import logging
 
 from homeassistant import config_entries
@@ -62,6 +63,9 @@ class JciHitachiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except RuntimeError as err:
                 _LOGGER.error(f"Failed to login API: {err}")
                 errors['base'] = 'login_error'
+            except (httpx.HTTPError, TimeoutError, ValueError) as err:
+                _LOGGER.error(f"Failed to reach the Hitachi cloud: {err}")
+                errors['base'] = 'connection_error'
             except Exception as err:
                 _LOGGER.error(f"Failed to login API: {err}")
                 errors['base'] = 'unknown_error'

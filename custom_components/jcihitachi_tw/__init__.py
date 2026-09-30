@@ -7,7 +7,10 @@ from queue import Queue
 from typing import Optional
 
 import async_timeout
+from homeassistant.core import callback
 from homeassistant.helpers import discovery
+from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.typing import UNDEFINED
 from homeassistant.helpers.update_coordinator import (CoordinatorEntity,
                                                       DataUpdateCoordinator,
                                                       UpdateFailed)
@@ -19,7 +22,7 @@ from .const import (API, CONF_DEVICES, CONF_EMAIL, CONF_PASSWORD, CONF_RETRY,
                     UPDATED_DATA)
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "number", "sensor", "switch", "light"]
+PLATFORMS = ["binary_sensor", "climate", "fan", "humidifier", "select", "sensor", "switch", "light"]
 DATA_UPDATE_INTERVAL = timedelta(seconds=30)
 BASE_TIMEOUT = 5
 
@@ -110,6 +113,7 @@ async def async_setup(hass, config):
     
     # Start jcihitachi components
     _LOGGER.debug("Starting JciHitachi components.")
+    _remove_replaced_month_selectors(hass, api)
     for platform in PLATFORMS:
         discovery.load_platform(hass, platform, DOMAIN, {}, config)
 
@@ -164,11 +168,31 @@ async def async_setup_entry(hass, config_entry):
 
     # Start jcihitachi components
     _LOGGER.debug("Starting JciHitachi components.") 
+    _remove_replaced_month_selectors(hass, hass.data[DOMAIN][API])
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
         
     
     # Return boolean to indicate that initialization was successful.
     return True
+
+
+def _remove_replaced_month_selectors(hass, api):
+    """Remove the 0-12 month selector numbers that the Month Selector drop-down replaced.
+
+    Home Assistant keeps registry entries of entities an integration no longer provides, so every
+    device page would show an empty "Month Selector" next to the new drop-down of the same name
+    (seen on 2026-09-17). Only this integration's `number` entries with the old unique_id are
+    removed; nothing else is touched. Automations using the old entity stop working either way.
+    """
+    registry = er.async_get(hass)
+    for thing in api.things.values():
+        unique_id = f"{thing.gateway_mac_address}_monthly_data_selector_number"
+        entity_id = registry.async_get_entity_id("number", DOMAIN, unique_id)
+        if entity_id is not None:
+            registry.async_remove(entity_id)
+            _LOGGER.info(
+                f"Removed {entity_id}: the month selector is now a drop-down (select entity)."
+            )
 
 
 @dataclass
@@ -180,9 +204,27 @@ class UpdateData:
 
 
 class JciHitachiEntity(CoordinatorEntity):
+    # entity names are translation keys (translations/*.json) prefixed with the device name
+    _attr_has_entity_name = True
+
     def __init__(self, thing, coordinator):
         super().__init__(coordinator)
         self._thing = thing
+
+    @callback
+    def add_to_platform_start(self, hass, platform, parallel_updates):
+        super().add_to_platform_start(hass, platform, parallel_updates)
+        if platform.config_entry is None:
+            # Set up from configuration.yaml: HA registers no device for an entity without a
+            # config entry, so it would show the translated name alone ("Power Consumption"
+            # once per device, entity ids power_consumption, _2, _3). Put the device name in
+            # front here, before HA derives the entity id.
+            name = self.name
+            self._attr_name = (
+                self._thing.name
+                if name is None or name is UNDEFINED
+                else f"{self._thing.name} {name}"
+            )
 
     @property
     def available(self) -> bool:
@@ -198,11 +240,6 @@ class JciHitachiEntity(CoordinatorEntity):
             "model": self._thing.model,
             "sw_version": self._thing.firmware_version,
         }
-
-    @property
-    def name(self):
-        """Return the thing's name."""
-        return self._thing.name
 
     @property
     def unique_id(self):
