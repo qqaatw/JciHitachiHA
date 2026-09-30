@@ -30,13 +30,10 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiErrorBinarySensorEntity(JciHitachiEntity, BinarySensorEntity):
+    _attr_translation_key = "error"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Error"
 
     @property
     def is_on(self):
@@ -59,13 +56,10 @@ class JciHitachiErrorBinarySensorEntity(JciHitachiEntity, BinarySensorEntity):
 
 
 class JciHitachiWaterFullBinarySensorEntity(JciHitachiEntity, BinarySensorEntity):
+    _attr_translation_key = "water_full"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Water Full Warning"
 
     @property
     def is_on(self):

@@ -1,0 +1,98 @@
+{
+    "config": {
+        "flow_title": "日立雲端智慧控（JciHitachi TW）",
+        "step": {
+            "user": {
+                "data": {
+                    "email": "日立雲端帳號（Email）",
+                    "password": "日立雲端密碼",
+                    "retry": "指令送出失敗時的重試次數",
+                    "devices": "裝置名稱（留空則自動從雲端取得全部裝置）",
+                    "add_another_device": "再新增一台裝置？"
+                }
+            },
+            "add_device": {
+                "data": {
+                    "devices": "裝置名稱（留空則自動從雲端取得全部裝置）",
+                    "add_another_device": "再新增一台裝置？"
+                }
+            }
+        },
+        "error": {
+            "assertion_check_error": "你指定的裝置在雲端帳號下找不到。",
+            "login_error": "帳號或密碼錯誤。",
+            "unknown_error": "發生未知錯誤。"
+        },
+        "abort": {
+            "already_configured": "裝置已經設定過了"
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "error": {
+                "name": "錯誤警示"
+            },
+            "water_full": {
+                "name": "滿水警示"
+            }
+        },
+        "fan": {
+            "air_speed": {
+                "name": "風速"
+            }
+        },
+        "light": {
+            "panel_led": {
+                "name": "顯示器亮度"
+            }
+        },
+        "number": {
+            "month_selector": {
+                "name": "選擇月份"
+            }
+        },
+        "sensor": {
+            "indoor_humidity": {
+                "name": "室內溼度"
+            },
+            "pm25": {
+                "name": "PM2.5"
+            },
+            "odor_level": {
+                "name": "異味等級"
+            },
+            "power_consumption": {
+                "name": "用電統計"
+            },
+            "monthly_power_consumption": {
+                "name": "月用電統計"
+            },
+            "month_indicator": {
+                "name": "用電統計月份"
+            },
+            "indoor_temperature": {
+                "name": "室內溫度"
+            }
+        },
+        "switch": {
+            "air_cleaning_filter": {
+                "name": "空氣清淨濾網設定"
+            },
+            "clean_filter_notify": {
+                "name": "濾網清潔通知"
+            },
+            "mold_prevention": {
+                "name": "機體防霉"
+            },
+            "wind_swingable": {
+                "name": "導風板擺動"
+            },
+            "ion": {
+                "name": "負離子"
+            },
+            "keypad_lock": {
+                "name": "按鍵鎖"
+            }
+        }
+    }
+}

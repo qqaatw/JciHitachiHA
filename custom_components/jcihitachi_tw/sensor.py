@@ -60,13 +60,10 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
+    _attr_translation_key = "indoor_humidity"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Indoor Humidity"
 
     @property
     def native_value(self):
@@ -92,13 +89,10 @@ class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
 
 
 class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
+    _attr_translation_key = "pm25"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} PM2.5"
 
     @property
     def native_value(self):
@@ -124,13 +118,10 @@ class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
 
 
 class JciHitachiOdorLevelSensorEntity(JciHitachiEntity, SensorEntity):
+    _attr_translation_key = "odor_level"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Odor Level"
 
     @property
     def native_value(self):
@@ -161,13 +152,10 @@ class JciHitachiOdorLevelSensorEntity(JciHitachiEntity, SensorEntity):
 
 
 class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
+    _attr_translation_key = "power_consumption"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Power Consumption"
 
     @property
     def native_value(self):
@@ -196,13 +184,10 @@ class JciHitachiPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
         return SensorStateClass.TOTAL_INCREASING
 
 class JciHitachiMonthlyPowerConsumptionSensorEntity(JciHitachiEntity, SensorEntity):
+    _attr_translation_key = "monthly_power_consumption"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Monthly Power Consumption"
 
     @property
     def native_value(self):
@@ -231,13 +216,10 @@ class JciHitachiMonthlyPowerConsumptionSensorEntity(JciHitachiEntity, SensorEnti
         return None
 
 class JciHitachiMonthIndicatorSensorEntity(JciHitachiEntity, SensorEntity):
+    _attr_translation_key = "month_indicator"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Month Indicator"
 
     @property
     def state(self):
@@ -266,13 +248,10 @@ class JciHitachiMonthIndicatorSensorEntity(JciHitachiEntity, SensorEntity):
 
 
 class JciHitachiIndoorTemperatureSensorEntity(JciHitachiEntity, SensorEntity):
+    _attr_translation_key = "indoor_temperature"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Indoor Temperature"
 
     @property
     def native_value(self):

@@ -21,10 +21,78 @@
         "error": {
             "assertion_check_error": "The device(s) you specified is/are not available from the API.",
             "login_error": "Incorrect email or password.",
-            "unknown_error": "Unknown error occurred."            
+            "unknown_error": "Unknown error occurred."
         },
         "abort": {
             "already_configured": "Device already configured"
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "error": {
+                "name": "Error"
+            },
+            "water_full": {
+                "name": "Water Full Warning"
+            }
+        },
+        "fan": {
+            "air_speed": {
+                "name": "Air Speed"
+            }
+        },
+        "light": {
+            "panel_led": {
+                "name": "panel LED"
+            }
+        },
+        "number": {
+            "month_selector": {
+                "name": "Month Selector"
+            }
+        },
+        "sensor": {
+            "indoor_humidity": {
+                "name": "Indoor Humidity"
+            },
+            "pm25": {
+                "name": "PM2.5"
+            },
+            "odor_level": {
+                "name": "Odor Level"
+            },
+            "power_consumption": {
+                "name": "Power Consumption"
+            },
+            "monthly_power_consumption": {
+                "name": "Monthly Power Consumption"
+            },
+            "month_indicator": {
+                "name": "Month Indicator"
+            },
+            "indoor_temperature": {
+                "name": "Indoor Temperature"
+            }
+        },
+        "switch": {
+            "air_cleaning_filter": {
+                "name": "Air Cleaning Filter Setting"
+            },
+            "clean_filter_notify": {
+                "name": "Clean Filter Notification"
+            },
+            "mold_prevention": {
+                "name": "Mold Prevention"
+            },
+            "wind_swingable": {
+                "name": "Wind Swingable"
+            },
+            "ion": {
+                "name": "Ion"
+            },
+            "keypad_lock": {
+                "name": "Keypad Lock"
+            }
         }
     }
 }

@@ -51,6 +51,8 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Monthly power consumption 月用電統計
   - ~~Sleep timer 睡眠計時器~~ (Only supported by LibJciHitachi)
   - ~~Freeze clean 凍結洗淨~~ (Only supported by LibJciHitachi)
+- All device types
+  - Entity names follow your Home Assistant language (English, 繁體中文); `translations/zh-Hant.json` uses the Taiwan wording of this list
 - Hitachi Dehumidifier 日立除濕機
   - Power 電源
   - Mode 運轉模式

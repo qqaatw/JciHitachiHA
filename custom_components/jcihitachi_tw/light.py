@@ -31,6 +31,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
+    _attr_translation_key = "panel_led"
     brightness_mapping = {
         "bright": 255,
         "dark": 170,
@@ -44,10 +45,6 @@ class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
     @property
     def unique_id(self):
         return f"{self._thing.gateway_mac_address}_dehumidifier_light"
-
-    @property
-    def name(self):
-        return f"{self._thing.name} panel LED"
 
     @property
     def supported_color_modes(self):
