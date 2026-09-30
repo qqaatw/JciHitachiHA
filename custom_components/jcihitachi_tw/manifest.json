@@ -1,6 +1,7 @@
 {
   "domain": "jcihitachi_tw",
   "name": "JciHitachi TW",
+  "after_dependencies": ["logbook"],
   "codeowners": ["@qqaatw"],
   "config_flow": true,
   "documentation": "https://github.com/qqaatw/JciHitachiHA",

@@ -31,6 +31,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
+    _attr_translation_key = "panel_led"
     brightness_mapping = {
         "bright": 255,
         "dark": 170,
@@ -46,10 +47,6 @@ class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
         return f"{self._thing.gateway_mac_address}_dehumidifier_light"
 
     @property
-    def name(self):
-        return f"{self._thing.name} panel LED"
-
-    @property
     def supported_color_modes(self):
         return {ColorMode.BRIGHTNESS}
 
@@ -60,7 +57,7 @@ class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
     @property
     def is_on(self):
         """Return true if the entity is on"""
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             if status.display_brightness == "all_off":
                 return False
@@ -72,7 +69,7 @@ class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
 
     @property
     def brightness(self):
-        status = self.hass.data[DOMAIN][UPDATED_DATA][self._thing.name]
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
         if status:
             return self.brightness_mapping.get(status.display_brightness, 0)
 
