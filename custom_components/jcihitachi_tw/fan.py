@@ -46,15 +46,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
+    _attr_translation_key = "air_speed"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
         self._supported_features = self.calculate_supported_features()
         self._supported_fan_speeds = self.calculate_supported_fan_speeds()
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Air Speed"
 
     @property
     def supported_features(self):
@@ -162,16 +159,13 @@ class JciHitachiDehumidifierFanEntity(JciHitachiEntity, FanEntity):
 
 
 class JciHitachiHeatExchangerFanEntity(JciHitachiEntity, FanEntity):
+    _attr_translation_key = "air_speed"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
         self._supported_features = self.calculate_supported_features()
         self._supported_fan_speeds = self.calculate_supported_fan_speeds()
         self._supported_presets = self.calculate_supported_presets()
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Air Speed"
 
     @property
     def supported_features(self):
