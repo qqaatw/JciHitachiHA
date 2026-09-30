@@ -8,6 +8,7 @@ API = "api"
 COORDINATOR = "coordinator"
 UPDATE_DATA = "update_data"
 UPDATED_DATA = "updated_data"
+SUPPORT_CACHE = "support_cache"
 
 CONF_RETRY = "retry"
 CONF_ADD_ANOTHER_DEVICE = "add_another_device"
