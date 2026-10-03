@@ -13,7 +13,12 @@ async def _async_setup(hass, async_add):
     coordinator = hass.data[DOMAIN][COORDINATOR]
 
     for thing in api.things.values():
-        if thing.type == "DH":
+        if thing.type == "AC":
+            if getattr(thing.support_code, "SleepModeRemainingTime", "unsupported") != "unsupported":
+                async_add(
+                    [JciHitachiACSleepModeSwitchEntity(thing, coordinator)],
+                    update_before_add=True)
+        elif thing.type == "DH":
             async_add(
                 [JciHitachiAirCleaningFilterEntity(thing, coordinator),
                  JciHitachiCleanFilterNotifySwitchEntity(thing, coordinator),
@@ -249,4 +254,52 @@ class JciHitachiKeypadLockSwitchEntity(JciHitachiEntity, SwitchEntity):
         """Turn keypad lock off."""
         _LOGGER.debug(f"Turn {self.name} off")
         self.put_queue(status_name="KeypadLock", status_str_value="disabled")
+        self.update()
+
+
+class JciHitachiACSleepModeSwitchEntity(JciHitachiEntity, SwitchEntity):
+    """Comfort sleep (舒眠) countdown switch for air conditioner."""
+
+    DEFAULT_SLEEP_MINUTES = 480  # 8 hours
+
+    def __init__(self, thing, coordinator):
+        super().__init__(thing, coordinator)
+        self._last_minutes = 0
+
+    @property
+    def name(self):
+        """Return the name of the entity."""
+        return f"{self._thing.name} Sleep Mode"
+
+    @property
+    def is_on(self):
+        """Indicate whether sleep mode is counting down."""
+        status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
+        if status:
+            value = status.sleep_timer
+            if isinstance(value, int) and value > 0:
+                self._last_minutes = value
+                return True
+            elif value == 0:
+                return False
+        return None
+
+    @property
+    def unique_id(self):
+        return f"{self._thing.gateway_mac_address}_sleep_mode_switch"
+
+    def turn_on(self):
+        """Turn sleep mode on with the last known duration."""
+        minutes = self._last_minutes or self.DEFAULT_SLEEP_MINUTES
+        support = getattr(self._thing.support_code, "SleepModeRemainingTime", "unsupported")
+        if isinstance(support, int) and support > 0:
+            minutes = min(minutes, support)
+        _LOGGER.debug(f"Turn {self.name} on with {minutes} minutes")
+        self.put_queue(status_name="sleep_timer", status_value=minutes)
+        self.update()
+
+    def turn_off(self):
+        """Cancel sleep mode."""
+        _LOGGER.debug(f"Turn {self.name} off")
+        self.put_queue(status_name="sleep_timer", status_value=0)
         self.update()

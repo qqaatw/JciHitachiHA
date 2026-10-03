@@ -49,7 +49,7 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Fast operation 快速運轉
   - Power consumption 用電統計 (supports HA core v2021.9.0+)
   - Monthly power consumption 月用電統計
-  - ~~Sleep timer 睡眠計時器~~ (Only supported by LibJciHitachi)
+  - Sleep timer 睡眠計時器 (switch + duration number)
   - ~~Freeze clean 凍結洗淨~~ (Only supported by LibJciHitachi)
 - Hitachi Dehumidifier 日立除濕機
   - Power 電源
