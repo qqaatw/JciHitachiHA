@@ -4,6 +4,7 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntity,
 )
+from homeassistant.helpers.entity import EntityDescription
 
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
@@ -40,14 +41,11 @@ class JciHitachiDehumidifierLightEntity(JciHitachiEntity, LightEntity):
 
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
+        self._attr_translation_key = "dehumidifier_light"
 
     @property
     def unique_id(self):
         return f"{self._thing.gateway_mac_address}_dehumidifier_light"
-
-    @property
-    def name(self):
-        return f"{self._thing.name} panel LED"
 
     @property
     def supported_color_modes(self):
