@@ -88,6 +88,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiClimateEntity(JciHitachiEntity, ClimateEntity):
+    _attr_name = None  # the device name
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
         self._supported_features = self.calculate_supported_features()

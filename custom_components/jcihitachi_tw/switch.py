@@ -38,13 +38,10 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiAirCleaningFilterEntity(JciHitachiEntity, SwitchEntity):
+    _attr_translation_key = "air_cleaning_filter"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Air Cleaning Filter Setting"
 
     @property
     def is_on(self):
@@ -75,13 +72,10 @@ class JciHitachiAirCleaningFilterEntity(JciHitachiEntity, SwitchEntity):
 
 
 class JciHitachiCleanFilterNotifySwitchEntity(JciHitachiEntity, SwitchEntity):
+    _attr_translation_key = "clean_filter_notify"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Clean Filter Notification"
 
     @property
     def is_on(self):
@@ -112,13 +106,10 @@ class JciHitachiCleanFilterNotifySwitchEntity(JciHitachiEntity, SwitchEntity):
 
 
 class JciHitachiMoldPrevSwitchEntity(JciHitachiEntity, SwitchEntity):
+    _attr_translation_key = "mold_prevention"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Mold Prevention"
 
     @property
     def is_on(self):
@@ -149,13 +140,10 @@ class JciHitachiMoldPrevSwitchEntity(JciHitachiEntity, SwitchEntity):
 
 
 class JciHitachiWindSwingableSwitchEntity(JciHitachiEntity, SwitchEntity):
+    _attr_translation_key = "wind_swingable"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Wind Swingable"
 
     @property
     def is_on(self):
@@ -185,13 +173,10 @@ class JciHitachiWindSwingableSwitchEntity(JciHitachiEntity, SwitchEntity):
         self.update()
 
 class JciHitachiIonSwitchEntity(JciHitachiEntity, SwitchEntity):
+    _attr_translation_key = "ion"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Ion"
 
     @property
     def is_on(self):
@@ -221,13 +206,10 @@ class JciHitachiIonSwitchEntity(JciHitachiEntity, SwitchEntity):
         self.update()
 
 class JciHitachiKeypadLockSwitchEntity(JciHitachiEntity, SwitchEntity):
+    _attr_translation_key = "keypad_lock"
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
-
-    @property
-    def name(self):
-        """Return the name of the entity."""
-        return f"{self._thing.name} Keypad Lock"
 
     @property
     def is_on(self):

@@ -58,6 +58,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class JciHitachiDehumidifierEntity(JciHitachiEntity, HumidifierEntity):
+    _attr_name = None  # the device name
+
     def __init__(self, thing, coordinator, supported_features):
         super().__init__(thing, coordinator)
         self._supported_features = supported_features
