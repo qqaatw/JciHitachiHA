@@ -1,0 +1,2 @@
+LibJciHitachi==1.7.2
+pytest>=8,<10

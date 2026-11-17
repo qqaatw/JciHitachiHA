@@ -1,0 +1,12 @@
+{
+    "entity": {
+        "switch": {
+            "ac_ion": {
+                "name": "電離抑菌"
+            },
+            "ac_airpurifier": {
+                "name": "電離淨化空氣"
+            }
+        }
+    }
+}

@@ -147,3 +147,9 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
 Apache License 2.0
 
 [^1]: The Wi-Fi modules in these models may not work due to Hitachi's server migration. Customers can request a free replacement if their machine is still under warranty.
+
+## AC ion controls
+
+Supported air conditioners expose independent Ion Antibacterial Treatment (電離抑菌, `Ion`) and Ion Air Purification (電離淨化空氣, `AirPurifier`) switches. The English names are descriptive translations of the Android app labels. The former requires AC power off; the latter requires power on. The switches do not change AC power. Missing or invalid states remain unknown.
+
+Power guards use cached device status, and queue submission is not appliance acknowledgement. The non-overriding field mappings compensate for missing AC definitions in LibJciHitachi 1.7.2 and can be removed when the library supports them.
