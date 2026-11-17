@@ -1,6 +1,9 @@
 """JciHitachi integration."""
 import datetime
 import logging
+import math
+
+from JciHitachi.model import STATUS_DICT
 
 from homeassistant.components.sensor import (SensorStateClass,
                                              SensorDeviceClass, SensorEntity)
@@ -10,6 +13,11 @@ from homeassistant.const import (CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
 from . import API, COORDINATOR, DOMAIN, UPDATED_DATA, JciHitachiEntity
 
 _LOGGER = logging.getLogger(__name__)
+
+# shortcut: LibJciHitachi 1.7.2 omits AC PM25; remove when the library supports it.
+STATUS_DICT["AC"].setdefault(
+    "PM25", {"controllable": False, "is_numeric": True, "legacy_name": "pm25_value"}
+)
 
 ODOR_LEVEL_LOW = "Low"
 ODOR_LEVEL_MIDDLE = "Middle"
@@ -27,6 +35,11 @@ async def _async_setup(hass, async_add):
 
     for thing in api.things.values():
         if thing.type == "AC":
+            pm25_support = getattr(thing.support_code, "PM25", None)
+            if "PM25" in getattr(thing.status_code, "_raw_status", {}) or (
+                type(pm25_support) is int and pm25_support >= 0
+            ):
+                async_add([JciHitachiPM25SensorEntity(thing, coordinator)])
             async_add(
                 [JciHitachiPowerConsumptionSensorEntity(thing, coordinator),
                  JciHitachiMonthlyPowerConsumptionSensorEntity(thing, coordinator),
@@ -92,6 +105,8 @@ class JciHitachiIndoorHumiditySensorEntity(JciHitachiEntity, SensorEntity):
 
 
 class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
     def __init__(self, thing, coordinator):
         super().__init__(thing, coordinator)
 
@@ -104,9 +119,8 @@ class JciHitachiPM25SensorEntity(JciHitachiEntity, SensorEntity):
     def native_value(self):
         """Return the PM2.5 value."""
         status = self.hass.data[DOMAIN][UPDATED_DATA].get(self._thing.name, None)
-        if status:
-            return None if status.pm25_value == "unsupported" else status.pm25_value
-        return None
+        value = getattr(status, "pm25_value", None)
+        return value if type(value) in (int, float) and math.isfinite(value) and value >= 0 else None
 
     @property
     def device_class(self):
