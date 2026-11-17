@@ -51,6 +51,10 @@ A home assistant integration for controlling Jci Hitachi devices, using [LibJciH
   - Monthly power consumption 月用電統計
   - Sleep timer 睡眠計時器 (switch + duration number)
   - ~~Freeze clean 凍結洗淨~~ (Only supported by LibJciHitachi)
+  - PM2.5 concentration 空氣微粒濃度 (`PM25`, read-only sensor when the AC reports the field or its capability)
+
+AC PM2.5 readings use µg/m³ and the measurement state class. Missing or invalid values remain unknown; valid zero is preserved. The shared validation also applies to existing dehumidifier sensors. Readings are device-reported and have not been independently calibrated; off-state zero does not guarantee ongoing sampling or clean air. A temporary non-overriding mapping supplies the AC field missing from LibJciHitachi 1.7.2.
+
 - Hitachi Dehumidifier 日立除濕機
   - Power 電源
   - Mode 運轉模式
